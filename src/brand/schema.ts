@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isSupportedCountry } from 'libphonenumber-js/min';
 import { defaultTexts } from './defaultTexts.ts';
 
 const text = z.string().trim().min(1);
@@ -41,6 +42,7 @@ const field = z
     defaultCountry: z
       .string()
       .regex(/^[A-Z]{2}$/)
+      .refine(isSupportedCountry, 'País de teléfono no soportado.')
       .optional(),
   })
   .refine(
@@ -104,6 +106,23 @@ export const brandSchema = z.strictObject({
       .array(field)
       .min(2)
       .superRefine((fields, ctx) => {
+        if (
+          fields.some(
+            (field) => ['name', 'email'].includes(field.id) && !field.required,
+          )
+        )
+          ctx.addIssue({
+            code: 'custom',
+            message:
+              'name y email deben ser obligatorios para identificar la participación.',
+          });
+        if (
+          fields.some((field) => field.id === 'phone' && field.type !== 'tel')
+        )
+          ctx.addIssue({
+            code: 'custom',
+            message: 'El campo phone debe ser de tipo tel.',
+          });
         if (new Set(fields.map((entry) => entry.id)).size !== fields.length)
           ctx.addIssue({
             code: 'custom',
@@ -161,6 +180,9 @@ export const brandSchema = z.strictObject({
       countdownSec: positiveInt,
       maxDurationSec: positiveInt,
       tileAnimationMs: positiveInt,
+      invalidMoveAnimationMs: positiveInt.default(120),
+      victoryAnimationMs: positiveInt.default(400),
+      swipeThresholdPx: positiveInt.default(24),
     })
     .refine(
       (game) =>

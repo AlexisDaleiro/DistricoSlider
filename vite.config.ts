@@ -13,7 +13,7 @@ export default defineConfig(async () => {
     build: { assetsInlineLimit: 0, target: 'es2020' },
     test: {
       environment: 'node',
-      include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
+      include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
     },
   };
 });

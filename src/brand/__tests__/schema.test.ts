@@ -96,7 +96,7 @@ describe('contrato white-label', () => {
   });
 
   it('resuelve assets del bundle y falla explícitamente si faltan', () => {
-    expect(asset(brand.brand.logo)).toContain('logo.svg');
+    expect(asset(brand.brand.logo)).toContain(brand.brand.logo);
     expect(asset(brand.theme.fonts.body.file)).toContain('.woff2');
     expect(() => asset('assets/missing.webp')).toThrow(/Asset no encontrado/);
   });

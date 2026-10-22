@@ -177,6 +177,9 @@ for (const id of ['_template', 'demo']) {
       countdownSec: 3,
       maxDurationSec: 300,
       tileAnimationMs: 130,
+      invalidMoveAnimationMs: 120,
+      victoryAnimationMs: 400,
+      swipeThresholdPx: 24,
     },
     leaderboard: {
       size: 10,

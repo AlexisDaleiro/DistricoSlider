@@ -40,3 +40,76 @@ textarea {
   padding: env(safe-area-inset-top) env(safe-area-inset-right)
     env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
+
+.game-header {
+  @apply mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8;
+}
+.game-layout {
+  @apply mx-auto grid max-w-6xl items-center gap-8 px-5 pt-4 pb-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-12;
+}
+.game-layout:has(> section:first-child) {
+  @apply lg:grid-cols-2;
+}
+.game-sidebar {
+  @apply rounded-brand bg-surface p-6 sm:p-7;
+}
+.game-eyebrow {
+  @apply text-xs font-bold tracking-[0.18em] text-primary uppercase;
+}
+.game-heading {
+  @apply font-heading text-3xl leading-tight font-bold tracking-tight sm:text-4xl;
+}
+.game-button {
+  @apply inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-brand px-6 py-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary disabled:cursor-default disabled:opacity-50;
+}
+.lead-input {
+  @apply min-h-12 w-full rounded-brand border border-muted/40 bg-bg px-4 py-3 text-base text-fg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-50;
+}
+.lead-input[aria-invalid='true'] {
+  border-color: var(--brand-danger);
+}
+.ranking-table th {
+  @apply px-3 py-3 text-xs font-bold text-muted;
+}
+.ranking-table td {
+  @apply border-t border-muted/15 px-3 py-5 text-sm;
+}
+.puzzle-stage {
+  width: min(100%, calc(100dvh - 10rem), 40rem);
+  justify-self: center;
+  animation-timing-function: ease-in-out;
+}
+.puzzle-tile {
+  cursor: pointer;
+  -webkit-touch-callout: none;
+}
+.puzzle-tile:disabled {
+  cursor: default;
+}
+@keyframes puzzle-shake-a {
+  25%,
+  75% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+@keyframes puzzle-shake-b {
+  25%,
+  75% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-stage {
+    animation: none !important;
+  }
+  .puzzle-tile,
+  .puzzle-reveal {
+    transition-duration: 0s !important;
+  }
+}
