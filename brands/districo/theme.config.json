@@ -67,13 +67,6 @@
         "required": true
       },
       {
-        "id": "company",
-        "type": "text",
-        "label": "Empresa",
-        "required": false,
-        "maxLength": 80
-      },
-      {
         "id": "phone",
         "type": "tel",
         "label": "Teléfono",
