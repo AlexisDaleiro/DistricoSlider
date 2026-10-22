@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
+import { ErrorBoundary } from './app/ErrorBoundary';
 import { brand } from './brand/brand';
 import { applyTheme } from './brand/applyTheme';
 import { BrandProvider } from './brand/BrandProvider';
@@ -11,7 +12,9 @@ applyTheme(brand);
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrandProvider>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </BrandProvider>
   </StrictMode>,
 );

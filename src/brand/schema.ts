@@ -210,6 +210,7 @@ export const brandSchema = z.strictObject({
         admin: positiveInt,
       }),
       warningMs: positiveInt,
+      errorRecoveryMs: positiveInt.default(2000),
       adminHotspot: z.enum([
         'top-right',
         'top-left',

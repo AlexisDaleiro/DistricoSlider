@@ -1,6 +1,6 @@
-# Kiosk Puzzle — Fases 1 a 4
+# Kiosk Puzzle — Fases 1 a 5
 
-Scaffolding white-label offline, motor puro y UI jugable de puzzle deslizable 3×3 / 4×4, según [el spec recibido](brief%20base/SPEC_KIOSK_PUZZLE.md). Incluye formulario configurable, persistencia IndexedDB y flujo FORM → COUNTDOWN → GAME → RESULT → LEADERBOARD. El lead y su sesión se guardan juntos antes del countdown; el resultado se guarda antes de mostrar RESULT.
+Scaffolding white-label offline, motor puro y UI jugable de puzzle deslizable 3×3 / 4×4, según [el spec recibido](brief%20base/SPEC_KIOSK_PUZZLE.md). Incluye formulario configurable, persistencia IndexedDB y flujo ATTRACT → FORM → COUNTDOWN → GAME → RESULT → LEADERBOARD. El lead y su sesión se guardan juntos antes del countdown; el resultado se guarda antes de mostrar RESULT. La Fase 5 agrega la máquina de flujo, aviso/reset por inactividad, loop de marca y recuperación de errores de render.
 
 Requisitos: Node.js 24+ y npm. Las versiones exactas verificadas están en `package.json`, `package-lock.json` y [DECISIONS.md](DECISIONS.md).
 
@@ -40,7 +40,7 @@ Abrir la URL local informada por Vite. `demo` también es la marca por defecto. 
 | Fase 2: property test de 10.000 mezclas                              | `npm test -- src/features/game/engine/__tests__/shuffle.test.ts`. Ejecuta 10.000 seeds por tamaño, 20.000 mezclas en total.                                                                                                                                                               |
 | Sin dependencias remotas en runtime                                  | `npm run build` y `npm run preview`; en la pestaña Network solo deben aparecer recursos del origen local. Fuentes, logos e imágenes se incluyen en `dist/assets`. El WebSocket HMR pertenece solo a dev.                                                                                  |
 
-La suite actual tiene **96 tests en 13 archivos**, incluidas las pruebas de las fases anteriores y 10.000 mezclas por tamaño (20.000 en total). El motor no depende de React ni del DOM. Los repositorios se prueban con `fake-indexeddb` y bases aisladas; las pruebas no borran la base del navegador. El límite de 30 segundos del property test es solo del runner, no un timeout de producto.
+La suite actual tiene **120 tests en 17 archivos**, incluidas las pruebas de las fases anteriores y 10.000 mezclas por tamaño (20.000 en total). El motor no depende de React ni del DOM. Los repositorios se prueban con `fake-indexeddb` y bases aisladas; las pruebas no borran la base del navegador. El límite de 30 segundos del property test es solo del runner, no un timeout de producto.
 
 ## Districo y aceptación manual de Fase 3
 
@@ -71,7 +71,7 @@ Para repetir las pruebas de Fase 3, primero completar el formulario válido y ac
 
 Tests de esta fase: `npm test -- src/features/game/__tests__`. Incluyen UI 3×3/4×4, reloj, gestos, deadline antes del siguiente rAF, victoria, timeout, preview, navegación temporal, recorte de imagen, caché, StrictMode y liberación de recursos. La comprobación física de 60 fps en una tablet Android queda pendiente de disponer del dispositivo; no se instaló Capacitor.
 
-`GameScreen` conserva el contrato `{ status, durationMs, moves }` mediante `onFinish`. Fase 4 conecta ese contrato con los repositorios y las pantallas de datos. La coordinación sigue usando estado local de React; la máquina de flujo de kiosco corresponde a Fase 5.
+`GameScreen` conserva el contrato `{ status, durationMs, moves }` mediante `onFinish`. Fase 4 conecta ese contrato con los repositorios y las pantallas de datos. Desde Fase 5, Zustand coordina las transiciones; formulario/tablero/imagen continúan locales a su montaje para poder limpiarlos por completo.
 
 ## Archivos de Fase 3
 
@@ -97,7 +97,7 @@ Usar `VITE_BRAND=districo` como arriba y mantener la misma URL y puerto al recar
 | Auditoría y reset sin borrar   | En `audit` aparece el resultado de `storage.persist`: concedido, denegado, no disponible o fallo. La API de reset guarda el marcador y auditoría sin borrar leads/sesiones, comprobado en el test de repos. Su control de admin pertenece a Fase 6.                                                                                                                                                                                 |
 | Fotos aleatorias locales       | Iniciar varias participaciones: COUNTDOWN/preview/tablero usan Biofresh, Gran Plus carne o Gran Plus salmón, sin selector. La selección puede repetirse. Las cuatro imágenes adjuntas contenían un duplicado exacto: se empaquetaron tres originales de 1024×1024, sin modificarlos.                                                                                                                                                |
 
-Los datos se conservan en el almacenamiento del navegador de ese origen. `storage.persist` solicita protección contra la expulsión automática y registra su respuesta; su denegación no impide capturar si IndexedDB funciona. Los controles de exportación, borrado protegido, backups nativos e inactividad no forman parte de esta fase. El texto de consentimiento sigue siendo el de demostración de cada config.
+Los datos se conservan en el almacenamiento del navegador de ese origen. `storage.persist` solicita protección contra la expulsión automática y registra su respuesta; su denegación no impide capturar si IndexedDB funciona. Los controles de exportación, borrado protegido y backups nativos siguen pendientes. La inactividad se incorpora en Fase 5, detallada abajo. El texto de consentimiento sigue siendo el de demostración de cada config.
 
 Pruebas adicionales: `npm test -- src/features/lead-form src/features/leaderboard src/features/game/__tests__/App.test.tsx`. Cubren validación dinámica, teléfonos, atributos de privacidad, doble submit, errores y reintentos, flujo real, ranking sin email y reapertura de los datos.
 
@@ -111,6 +111,43 @@ La revisión de navegador usó datos ficticios en un origen separado, puerto 517
 - Tests creados: `src/data/__tests__/repos.test.ts`, `src/features/lead-form/__tests__/schema.test.ts`, `LeadFormScreen.test.tsx`, `src/features/leaderboard/__tests__/screens.test.tsx`.
 - Fotos agregadas: `brands/districo/assets/puzzle/biofresh.jpg`, `granplus-carne.jpg`, `granplus-salmon.jpg`.
 - Modificados sobre Fase 3: `src/app/App.tsx`, `src/features/game/GameScreen.tsx`, `src/features/game/__tests__/App.test.tsx`, `src/shared/lib/time.ts`, `src/brand/schema.ts`, `src/brand/defaultTexts.ts`, `src/styles/index.css`, `brands/districo/theme.config.json`, `package.json`, `package-lock.json`, `README.md`, `DECISIONS.md`.
+
+## Aceptación manual de Fase 5
+
+Iniciar Districo con el comando anterior y usar datos ficticios. El estado del flujo no se persiste en localStorage; al recargar se abre ATTRACT y se conservan los datos de IndexedDB.
+
+| Pantalla                                        | Sin actividad: aviso → reset con el config actual                                                                                                                                                          |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FORM                                            | Aviso a los 50 s, ATTRACT a los 60 s.                                                                                                                                                                      |
+| COUNTDOWN                                       | Aviso a los 20 s, ATTRACT a los 30 s si el countdown sigue montado. Normalmente termina a los 3 s; para probar el timeout manualmente, subir temporalmente `game.countdownSec` a 35 y restaurarlo después. |
+| GAME, incluido guardado/reintento del resultado | Aviso a los 80 s, ATTRACT a los 90 s.                                                                                                                                                                      |
+| RESULT                                          | Aviso a los 5 s, ATTRACT a los 15 s.                                                                                                                                                                       |
+| LEADERBOARD                                     | Aviso a los 10 s, ATTRACT a los 20 s.                                                                                                                                                                      |
+| ATTRACT                                         | Sin timeout ni aviso. `admin` está reservado en la tabla; su UI y acceso corresponden a Fase 6.                                                                                                            |
+
+No mover el puntero durante estas comprobaciones: `pointermove` cuenta como actividad, además de pointerdown, teclado, rueda y touchstart. Los plazos se renuevan al cambiar de pantalla. Con otras marcas se usan sus propios `kiosk.inactivityMs` y `warningMs`.
+
+| Criterio                            | Verificación manual                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aviso y continuación                | Completar parcialmente FORM y esperar el aviso. **Sigo acá** o tocar cualquier parte del overlay renueva el plazo; el aviso desaparece (como máximo en el siguiente tick de 250 ms) y conserva el borrador. Tab queda dentro del aviso; el contenido de atrás está `inert` y no recibe clicks.                                                                                                                                          |
+| Reset limpio de cualquier pantalla  | Dejar vencer el plazo en cada pantalla de la tabla. Vuelve a la portada, desaparecen aviso/preview/tablero y se quita el foco del input para cerrar el teclado. Volver a tocar la portada: inputs vacíos, nuevos nombres aleatorios y consentimiento desmarcado. También comprobarlo tras un fallo/reintento de guardado.                                                                                                               |
+| Abandono sin perder lead            | Enviar un formulario válido, entrar en GAME y dejar vencer el plazo. En DevTools → Application → IndexedDB → `kiosk-puzzle`, refrescar `sessions`: la sesión pasa de `started` a `abandoned`; el lead permanece en `leads`. En COUNTDOWN sucede lo mismo. Una sesión ya completada conserva su resultado al resetear RESULT/ranking. `audit` registra `flow_reset` con motivo/pantalla.                                                 |
+| Background                          | En FORM o GAME, cambiar de pestaña/app durante más del plazo y volver: `visibilitychange` comprueba el deadline inmediatamente, sin conceder un plazo nuevo. El puente nativo `appStateChange` se agrega en Fase 7.                                                                                                                                                                                                                     |
+| ATTRACT y medios locales            | Tocar portada, encabezado o CTA abre FORM. **Ver ranking** abre solo el ranking. Para slideshow, agregar dos imágenes locales a `attract.media`: alternan según `slideIntervalMs`. Para video, configurar `mode: "video"` y un MP4 local; debe estar muted/playsInline/loop/autoplay/preload. Un error o rechazo de autoplay cae a las imágenes configuradas, o al logo si no hay imágenes. Al entrar a FORM no queda un video montado. |
+| Gestos y errores                    | Click derecho no abre menú; imágenes no se arrastran; selección de texto solo en inputs. En tablet, probar pinch/pull-to-refresh. El test de robustez comprueba también ctrl+wheel, logging global y error de render → mensaje **Un momento…** → ATTRACT a los `errorRecoveryMs` del config (2000 por defecto). Los errores de render/globales quedan en `audit` con detalle truncado; si falla audit, la UI igualmente se recupera.    |
+| Transiciones y carreras de guardado | `npm test -- src/flow src/kiosk src/features/attract src/features/game/__tests__/App.test.tsx`. Verifica todas las combinaciones de la tabla, transición inválida en dev/producción, timers/listeners con cleanup, callback actualizado, pantallas con timeout, commit y resultado tardíos que no reviven una visita anterior.                                                                                                          |
+
+El abandono se solicita al resetear pero la limpieza visual ocurre inmediatamente, sin esperar a IndexedDB. Si falla esa escritura se audita y la recuperación de huérfanas sigue disponible en el próximo arranque. No se borra ningún lead ni resultado. El guardado pendiente mantiene el timeout de GAME; no se inventa otra pantalla ni otro tiempo de configuración.
+
+La opción de alternar automáticamente ATTRACT con ranking es opcional en el spec y queda sin activar/implementar; el ranking tiene acceso manual y su timeout. La prueba de 500 ciclos con modo QA pertenece a Fase 8. Los bloqueos nativos de Atrás, orientación, keep-awake y `adjustResize` esperan Fase 7; no se instaló Capacitor.
+
+Evidencia local de navegador: `artifacts/districo-phase5-warning.png` y `districo-phase5-clean-form.png` (ignorados por Git).
+
+## Archivos de Fase 5
+
+- Creados: `src/flow/transitions.ts`, `flowStore.ts`; `src/kiosk/activityTracker.ts`, `useInactivity.ts`, `InactivityWarning.tsx`, `browserKiosk.ts`, `auditError.ts`; `src/app/ScreenRouter.tsx`, `ErrorBoundary.tsx`; `src/features/attract/AttractScreen.tsx`, `AttractMedia.tsx`; `src/shared/ui/BrandHeader.tsx`.
+- Tests creados: `src/flow/__tests__/flowStore.test.ts`, `src/kiosk/__tests__/inactivity.test.tsx`, `robustness.test.tsx`, `src/features/attract/__tests__/AttractMedia.test.tsx`.
+- Modificados sobre Fase 4: `src/app/App.tsx`, `src/main.tsx`, `src/features/game/__tests__/App.test.tsx`, `src/brand/schema.ts`, `defaultTexts.ts`, `src/styles/index.css`, `index.html`, configs de las tres marcas, `scripts/generate-placeholders.ts`, `package.json`, `package-lock.json`, `README.md`, `DECISIONS.md`.
 
 ## Crear otra marca
 
@@ -136,4 +173,4 @@ El config se valida con Zod tanto en los scripts como en el bundle; `t()` mergea
 
 ## Alcance pendiente
 
-Las fases 5–8 siguen pendientes. El regreso automático por inactividad, máquina de estados de kiosco, admin/exportación, Capacitor, APK, `brand:build`, `patch-android.ts` y preparación operativa del dispositivo se implementarán en su fase. Consultar [DECISIONS.md](DECISIONS.md) para las correcciones de referencia y las decisiones de compatibilidad.
+Las fases 6–8 siguen pendientes: admin/exportación, backups nativos, Capacitor, APK, `brand:build`, `patch-android.ts`, preparación operativa del dispositivo y pulido/QA. Consultar [DECISIONS.md](DECISIONS.md) para las correcciones de referencia y las decisiones de compatibilidad.

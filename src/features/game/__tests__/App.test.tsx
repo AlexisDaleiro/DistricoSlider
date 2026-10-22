@@ -15,6 +15,8 @@ import { db } from '../../../data/db';
 import { leadsRepo } from '../../../data/repos/leadsRepo';
 import { sessionsRepo } from '../../../data/repos/sessionsRepo';
 import { prepareImage } from '../image/prepareImage';
+import { flowStore } from '../../../flow/flowStore';
+import { checkActivityNow } from '../../../kiosk/activityTracker';
 
 vi.mock('../image/prepareImage', () => ({ prepareImage: vi.fn() }));
 // Los tiempos de countdown tienen su propia suite. Aquí se prueba el commit y la navegación con IDB realista.
@@ -30,6 +32,12 @@ vi.mock('../engine/shuffle', async () => {
   };
 });
 beforeEach(async () => {
+  flowStore.setState({
+    screen: 'attract',
+    leadUuid: null,
+    sessionUuid: null,
+    visit: 0,
+  });
   vi.mocked(prepareImage).mockReset();
   vi.mocked(prepareImage).mockResolvedValue({
     url: 'blob:decoded',
@@ -107,12 +115,156 @@ it('espera decode y commit antes de countdown; Terminar abandona sin perder el l
     screen.getByRole('button', { name: brand.texts['common.finish'] }),
   );
   await screen.findByRole('button', { name: brand.attract.cta });
-  expect((await db.sessions.toArray())[0].status).toBe('abandoned');
+  await waitFor(async () =>
+    expect((await db.sessions.toArray())[0].status).toBe('abandoned'),
+  );
   expect(await db.leads.count()).toBe(1);
   fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
   expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe('');
   mounted.unmount();
   expect(release).toHaveBeenCalled();
+});
+
+function idleClock() {
+  let now = 0;
+  const clock = vi.spyOn(performance, 'now').mockImplementation(() => now);
+  return (ms: number) => {
+    now += ms;
+    act(() => {
+      checkActivityNow();
+    });
+    return clock;
+  };
+}
+
+it('el aviso conserva borrador al continuar, pero timeout limpia inputs, consent y foco', async () => {
+  const idle = idleClock();
+  render(<App />);
+  await openForm();
+  const email = screen.getByLabelText('Email') as HTMLInputElement;
+  const previousName = email.name;
+  email.focus();
+  idle(brand.kiosk.inactivityMs.form - brand.kiosk.warningMs);
+  expect(screen.getByRole('dialog').textContent).toContain(
+    brand.texts['inactivity.title'],
+  );
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.texts['inactivity.continue'] }),
+  );
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(email.value).toContain('ANA@EXAMPLE.COM');
+  idle(brand.kiosk.inactivityMs.form);
+  await screen.findByRole('button', { name: brand.attract.cta });
+  expect(document.activeElement).not.toBe(email);
+  fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
+  const clean = screen.getByLabelText('Email') as HTMLInputElement;
+  expect(clean.value).toBe('');
+  expect(clean.name).not.toBe(previousName);
+  expect(
+    (screen.getByLabelText(brand.form.consent.text) as HTMLInputElement)
+      .checked,
+  ).toBe(false);
+  expect(await db.leads.count()).toBe(0);
+});
+
+it.each(['countdown', 'game'] as const)(
+  'inactividad en %s abandona la sesión, conserva el lead y libera recursos',
+  async (phase) => {
+    const idle = idleClock();
+    render(<App />);
+    await openForm();
+    await submit();
+    await screen.findByRole('button', { name: 'Continuar countdown' });
+    if (phase === 'game') await enterGame();
+    idle(brand.kiosk.inactivityMs[phase] - brand.kiosk.warningMs);
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    idle(brand.kiosk.warningMs);
+    await screen.findByRole('button', { name: brand.attract.cta });
+    await waitFor(async () =>
+      expect((await db.sessions.toArray())[0].status).toBe('abandoned'),
+    );
+    expect(await db.leads.count()).toBe(1);
+    expect(flowStore.getState().sessionUuid).toBeNull();
+  },
+);
+
+it.each(['result', 'leaderboard'] as const)(
+  'inactividad en %s vuelve a ATTRACT sin alterar un resultado completado',
+  async (phase) => {
+    const idle = idleClock();
+    render(<App />);
+    await openForm();
+    await submit();
+    await enterGame();
+    solve();
+    await screen.findByRole('heading', { name: brand.texts['result.title'] });
+    if (phase === 'leaderboard')
+      fireEvent.click(
+        screen.getByRole('button', { name: brand.texts['result.ranking'] }),
+      );
+    idle(brand.kiosk.inactivityMs[phase] - brand.kiosk.warningMs);
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    idle(brand.kiosk.warningMs);
+    await screen.findByRole('button', { name: brand.attract.cta });
+    expect((await db.sessions.toArray())[0].status).toBe('completed');
+    expect(await db.leads.count()).toBe(1);
+  },
+);
+
+it('un commit tardío tras el reset conserva el lead, abandona esa sesión y no navega al visitante siguiente', async () => {
+  const idle = idleClock();
+  const originalCreate = leadsRepo.createWithSession;
+  let commit: (() => Promise<void>) | undefined;
+  vi.spyOn(leadsRepo, 'createWithSession').mockImplementationOnce(
+    (...args) =>
+      new Promise<Awaited<ReturnType<typeof originalCreate>>>((resolve) => {
+        commit = async () => resolve(await originalCreate(...args));
+      }) as ReturnType<typeof originalCreate>,
+  );
+  render(<App />);
+  await openForm();
+  await submit();
+  idle(brand.kiosk.inactivityMs.form);
+  await screen.findByRole('button', { name: brand.attract.cta });
+  fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
+  await act(async () => {
+    await commit?.();
+  });
+  await waitFor(async () =>
+    expect((await db.sessions.toArray())[0].status).toBe('abandoned'),
+  );
+  expect(await db.leads.count()).toBe(1);
+  expect(flowStore.getState().screen).toBe('form');
+  expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe('');
+  expect(flowStore.getState().sessionUuid).toBeNull();
+});
+
+it('una respuesta tardía de resultado no revive RESULT tras resetear', async () => {
+  const idle = idleClock();
+  const originalFinish = sessionsRepo.finish;
+  let complete: (() => Promise<void>) | undefined;
+  vi.spyOn(sessionsRepo, 'finish').mockImplementationOnce(async (...args) => {
+    const stored = await originalFinish(...args);
+    return new Promise((resolve) => {
+      complete = async () => resolve(stored);
+    });
+  });
+  render(<App />);
+  await openForm();
+  await submit();
+  await enterGame();
+  solve();
+  await waitFor(() => expect(complete).toBeDefined());
+  idle(brand.kiosk.inactivityMs.game);
+  await screen.findByRole('button', { name: brand.attract.cta });
+  await act(async () => {
+    await complete?.();
+  });
+  expect(flowStore.getState().screen).toBe('attract');
+  expect(
+    screen.queryByRole('heading', { name: brand.texts['result.title'] }),
+  ).toBeNull();
+  expect((await db.sessions.toArray())[0].status).toBe('completed');
 });
 
 it('un fallo de preparación muestra error propio en FORM y permite reintentar antes de guardar', async () => {
@@ -181,6 +333,12 @@ it('persiste victoria antes de RESULT, muestra ranking enmascarado y conserva da
   first.unmount();
   db.close();
   await db.open();
+  flowStore.setState({
+    screen: 'attract',
+    leadUuid: null,
+    sessionUuid: null,
+    visit: flowStore.getState().visit + 1,
+  });
   render(<App />);
   fireEvent.click(
     await screen.findByRole('button', { name: brand.texts['result.ranking'] }),

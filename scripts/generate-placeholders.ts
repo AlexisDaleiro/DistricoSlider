@@ -198,6 +198,7 @@ for (const id of ['_template', 'demo']) {
         admin: 60000,
       },
       warningMs: 10000,
+      errorRecoveryMs: 2000,
       adminHotspot: 'top-right',
       adminTapCount: 5,
       adminTapWindowMs: 3000,

@@ -10,6 +10,8 @@ export const defaultTexts = {
   'inactivity.title': '¿Seguís ahí?',
   'inactivity.body': 'Volvemos al inicio en {seconds} s',
   'inactivity.continue': 'Sigo acá',
+  'error.recovering': 'Un momento…',
+  'attract.mediaAlt': 'Imagen de la marca',
   'form.errors.required': 'Este campo es obligatorio',
   'form.errors.email': 'Ingresá un email válido',
   'form.errors.phone': 'Ingresá un teléfono válido',
