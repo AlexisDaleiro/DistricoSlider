@@ -57,6 +57,7 @@ async function openForm() {
   fireEvent.click(
     await screen.findByRole('button', { name: brand.attract.cta }),
   );
+  await screen.findByLabelText('Nombre y apellido');
   fireEvent.change(screen.getByLabelText('Nombre y apellido'), {
     target: { value: 'Ana Pérez' },
   });
@@ -120,7 +121,9 @@ it('espera decode y commit antes de countdown; Terminar abandona sin perder el l
   );
   expect(await db.leads.count()).toBe(1);
   fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
-  expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe('');
+  expect(
+    ((await screen.findByLabelText('Email')) as HTMLInputElement).value,
+  ).toBe('');
   mounted.unmount();
   expect(release).toHaveBeenCalled();
 });
@@ -157,7 +160,7 @@ it('el aviso conserva borrador al continuar, pero timeout limpia inputs, consent
   await screen.findByRole('button', { name: brand.attract.cta });
   expect(document.activeElement).not.toBe(email);
   fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
-  const clean = screen.getByLabelText('Email') as HTMLInputElement;
+  const clean = (await screen.findByLabelText('Email')) as HTMLInputElement;
   expect(clean.value).toBe('');
   expect(clean.name).not.toBe(previousName);
   expect(
@@ -227,6 +230,7 @@ it('un commit tardío tras el reset conserva el lead, abandona esa sesión y no 
   idle(brand.kiosk.inactivityMs.form);
   await screen.findByRole('button', { name: brand.attract.cta });
   fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
+  await screen.findByLabelText('Email');
   await act(async () => {
     await commit?.();
   });

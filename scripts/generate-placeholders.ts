@@ -2,6 +2,7 @@ import { copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { projectRoot } from './validate-brand';
+import { generateSounds } from './generate-sounds';
 
 // Arte geométrico propio: nueve zonas diferentes y trazos que cruzan la grilla.
 // También permite distinguir las dieciséis fichas si se usa una grilla 4×4.
@@ -26,6 +27,7 @@ const puzzle = `<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="144
 </svg>`;
 
 for (const id of ['_template', 'demo']) {
+  await generateSounds(id);
   const directory = resolve(projectRoot, 'brands', id);
   for (const folder of ['puzzle', 'attract', 'fonts', 'icon'])
     await mkdir(resolve(directory, 'assets', folder), { recursive: true });
@@ -180,6 +182,11 @@ for (const id of ['_template', 'demo']) {
       invalidMoveAnimationMs: 120,
       victoryAnimationMs: 400,
       swipeThresholdPx: 24,
+      sounds: {
+        enabled: false,
+        move: 'assets/sounds/move.wav',
+        win: 'assets/sounds/win.wav',
+      },
     },
     leaderboard: {
       size: 10,
@@ -189,6 +196,7 @@ for (const id of ['_template', 'demo']) {
     },
     kiosk: {
       orientation: 'landscape',
+      splashMs: 1200,
       inactivityMs: {
         form: 60000,
         countdown: 30000,
@@ -199,6 +207,15 @@ for (const id of ['_template', 'demo']) {
       },
       warningMs: 10000,
       errorRecoveryMs: 2000,
+      admin: {
+        pinTimeoutMs: 20000,
+        resetHoldMs: 2000,
+        deleteHoldMs: 3000,
+        lockoutBaseMs: 30000,
+        lockoutMaxMs: 900000,
+        maxAttempts: 3,
+        exportFreshMs: 600000,
+      },
       adminHotspot: 'top-right',
       adminTapCount: 5,
       adminTapWindowMs: 3000,

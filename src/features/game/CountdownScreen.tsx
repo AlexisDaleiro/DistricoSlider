@@ -10,7 +10,7 @@ export function CountdownScreen({
   onComplete: () => void;
 }) {
   const { game } = useBrand();
-  const [seconds, setSeconds] = useState(game.countdownSec);
+  const [seconds, setSeconds] = useState(Math.ceil(game.countdownSec));
   useEffect(() => {
     const start = performance.now();
     let frame = 0;

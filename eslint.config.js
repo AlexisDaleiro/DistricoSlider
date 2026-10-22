@@ -4,7 +4,19 @@ import hooks from 'eslint-plugin-react-hooks';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'artifacts/**'] },
+  {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      'artifacts/**',
+      'android/**',
+      '.android-sdk/**',
+      '.android-assets/**',
+      '.android-keys/**',
+      '.gradle-cache/**',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

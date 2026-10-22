@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { asset } from '../brand/brand';
 import { useBrand } from '../brand/BrandProvider';
 import { t } from '../brand/t';
@@ -20,6 +20,8 @@ import { sessionsRepo } from '../data/repos/sessionsRepo';
 import type { GameSession } from '../data/types';
 import { dayKey } from '../shared/lib/time';
 import { recordError } from '../kiosk/auditError';
+import { AdminScreen } from '../features/admin/AdminScreen';
+import { settingsRepo } from '../data/repos/settingsRepo';
 
 /** El store solo conserva IDs; borrador, tablero y recursos viven en este montaje. */
 export function ScreenRouter({ visit }: { visit: number }) {
@@ -30,6 +32,19 @@ export function ScreenRouter({ visit }: { visit: number }) {
   const [initialState, setInitialState] = useState<PuzzleState | null>(null);
   const [startError, setStartError] = useState(false);
   const [session, setSession] = useState<GameSession | null>(null);
+  const [gridSize, setGridSize] = useState(brand.game.gridSize);
+  useEffect(() => {
+    let active = true;
+    void settingsRepo
+      .get<number>(`gridSize:${brand.event.id}`)
+      .then((size) => {
+        if (active && (size === 3 || size === 4)) setGridSize(size);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [brand.event.id]);
   const [saveTask, setSaveTask] = useState<GameOutcome | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -79,9 +94,15 @@ export function ScreenRouter({ visit }: { visit: number }) {
     },
     [session, isCurrent, runSave],
   );
-  const start = () => {
+  const start = async () => {
     try {
-      const size = brand.game.gridSize;
+      const override = await settingsRepo.get<number>(
+        `gridSize:${brand.event.id}`,
+      );
+      if (!isCurrent() || flowStore.getState().screen !== 'attract') return;
+      const size =
+        override === 3 || override === 4 ? override : brand.game.gridSize;
+      setGridSize(size);
       setInitialState(
         shuffle(size, {
           moves: brand.game.shuffleMoves[String(size) as '3' | '4']!,
@@ -98,7 +119,7 @@ export function ScreenRouter({ visit }: { visit: number }) {
       throw new Error('La imagen todavía no está lista.');
     const created = await leadsRepo.createWithSession(
       normalize(values, brand),
-      brand.game.gridSize,
+      initialState.size,
       image.src,
     );
     if (!isCurrent()) {
@@ -119,7 +140,9 @@ export function ScreenRouter({ visit }: { visit: number }) {
     case 'attract':
       return (
         <AttractScreen
-          onStart={start}
+          onStart={() => void start()}
+          gridSize={gridSize}
+          onAdmin={() => flowStore.getState().go('admin')}
           startError={startError}
           onLeaderboard={() => flowStore.getState().go('leaderboard')}
         />
@@ -194,12 +217,11 @@ export function ScreenRouter({ visit }: { visit: number }) {
       return (
         <LeaderboardScreen
           dayKey={session?.dayKey ?? dayKey()}
-          gridSize={session?.gridSize ?? brand.game.gridSize}
+          gridSize={session?.gridSize ?? gridSize}
           onFinish={() => void flowStore.getState().resetToAttract('finish')}
         />
       );
     case 'admin':
-      // Estado reservado por la tabla del spec; no hay acceso ni UI admin hasta Fase 6.
-      return null;
+      return <AdminScreen />;
   }
 }

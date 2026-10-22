@@ -7,3 +7,9 @@ coverage/
 *.local
 *.tsbuildinfo
 artifacts/
+.android-sdk/
+.android-assets/
+.android-keys/
+.gradle-cache/
+*.jks
+*.keystore

@@ -1,6 +1,8 @@
 import { db, type KioskDB } from './db';
 import { createAuditRepo } from './repos/auditRepo';
 import { createSessionsRepo } from './repos/sessionsRepo';
+import { createPinRepo } from './repos/pinRepo';
+import { brand } from '../brand/brand';
 
 export async function initializeDatabase(
   database: KioskDB,
@@ -24,9 +26,13 @@ export async function initializeDatabase(
 }
 let initialization: Promise<void> | null = null;
 export function initializeData(): Promise<void> {
-  initialization ??= initializeDatabase(db).catch((cause) => {
-    initialization = null;
-    throw cause;
-  });
+  initialization ??= initializeDatabase(db)
+    .then(async () => {
+      await createPinRepo(brand.brand.id).ensure(__INITIAL_ADMIN_PIN__);
+    })
+    .catch((cause) => {
+      initialization = null;
+      throw cause;
+    });
   return initialization;
 }

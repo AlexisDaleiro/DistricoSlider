@@ -4,8 +4,12 @@ import type { Lead, NewLeadInput } from '../types';
 import { dayKey } from '../../shared/lib/time';
 import { normalizeEmail, normalizePhone } from '../../shared/lib/normalize';
 import { createSessionsRepo } from './sessionsRepo';
+import { backupEvent } from '../backup';
 
-export function createLeadsRepo(database: KioskDB) {
+export function createLeadsRepo(
+  database: KioskDB,
+  afterSave?: (eventId: string) => void,
+) {
   async function create(input: NewLeadInput): Promise<Lead> {
     const email = z.email().parse(normalizeEmail(input.email));
     const name = z.string().trim().min(1).parse(input.name);
@@ -36,13 +40,17 @@ export function createLeadsRepo(database: KioskDB) {
     return { ...lead, id };
   }
   return {
-    create,
-    createWithSession: (
+    create: async (input: NewLeadInput) => {
+      const lead = await create(input);
+      afterSave?.(input.eventId);
+      return lead;
+    },
+    createWithSession: async (
       input: NewLeadInput,
       gridSize: 3 | 4,
       imageSrc: string,
-    ) =>
-      database.transaction(
+    ) => {
+      const result = await database.transaction(
         'rw',
         database.leads,
         database.sessions,
@@ -55,7 +63,12 @@ export function createLeadsRepo(database: KioskDB) {
           );
           return { lead, session };
         },
-      ),
+      );
+      afterSave?.(input.eventId);
+      return result;
+    },
   };
 }
-export const leadsRepo = createLeadsRepo(db);
+export const leadsRepo = createLeadsRepo(db, (eventId) => {
+  void backupEvent(eventId, false);
+});

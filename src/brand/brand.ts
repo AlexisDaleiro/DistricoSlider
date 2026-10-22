@@ -1,5 +1,6 @@
 import raw from '@brand/theme.config.json';
 import { brandSchema, type BrandConfig } from './schema';
+import { QA_ENABLED, qaBrand } from '../qa/config';
 
 const assetUrls = import.meta.glob<string>('@brand/assets/**/*', {
   eager: true,
@@ -7,7 +8,8 @@ const assetUrls = import.meta.glob<string>('@brand/assets/**/*', {
   import: 'default',
 });
 
-export const brand: BrandConfig = brandSchema.parse(raw);
+const parsed = brandSchema.parse(raw);
+export const brand: BrandConfig = QA_ENABLED ? qaBrand(parsed) : parsed;
 
 /** Resuelve exclusivamente assets locales incluidos por Vite. */
 export function asset(relPath: string): string {

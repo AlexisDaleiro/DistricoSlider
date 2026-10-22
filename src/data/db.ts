@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import type { Lead, GameSession, Setting, AuditEntry } from './types';
+import { QA_ENABLED } from '../qa/config';
 
 export class KioskDB extends Dexie {
   leads!: Table<Lead, number>;
@@ -20,4 +21,4 @@ export class KioskDB extends Dexie {
     });
   }
 }
-export const db = new KioskDB();
+export const db = new KioskDB(QA_ENABLED ? 'kiosk-puzzle-qa' : 'kiosk-puzzle');

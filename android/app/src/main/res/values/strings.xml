@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">Pieza Puzzle</string>
+<string name="title_activity_main">Pieza Puzzle</string>
+<string name="package_name">uy.kioskpuzzle.demo</string>
+<string name="custom_url_scheme">uy.kioskpuzzle.demo</string>
+</resources>

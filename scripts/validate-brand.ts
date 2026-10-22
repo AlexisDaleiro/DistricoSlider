@@ -2,6 +2,8 @@ import { readFile, realpath, stat } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { reviewContrast } from '../src/brand/contrast.ts';
+export { contrastRatio } from '../src/brand/contrast.ts';
 import {
   brandIdSchema,
   brandSchema,
@@ -12,21 +14,6 @@ export const projectRoot = resolve(
   dirname(fileURLToPath(import.meta.url)),
   '..',
 );
-
-export function contrastRatio(first: string, second: string): number {
-  const luminance = (hex: string) => {
-    const channels = [1, 3, 5].map((offset) => {
-      const value = parseInt(hex.slice(offset, offset + 2), 16) / 255;
-      return value <= 0.04045
-        ? value / 12.92
-        : ((value + 0.055) / 1.055) ** 2.4;
-    });
-    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
-  };
-  const a = luminance(first),
-    b = luminance(second);
-  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-}
 
 export function parseBrand(raw: unknown): BrandConfig {
   const result = brandSchema.safeParse(raw);
@@ -66,6 +53,8 @@ export async function validateBrand(
     ...Object.values(config.theme.fonts).map((font) => font.file),
     ...config.attract.media,
     ...config.game.images.map((image) => image.src),
+    ...(config.game.sounds.move ? [config.game.sounds.move] : []),
+    ...(config.game.sounds.win ? [config.game.sounds.win] : []),
     ...(config.theme.backgroundImage ? [config.theme.backgroundImage] : []),
   ]);
   const canonicalDirectory = await realpath(directory);
@@ -84,6 +73,15 @@ export async function validateBrand(
         const bytes = await readFile(file);
         if (bytes.toString('ascii', 0, 4) !== 'wOF2')
           throw new Error('La fuente no es un archivo WOFF2 válido.');
+      }
+      if (path.endsWith('.wav')) {
+        const bytes = await readFile(file);
+        if (
+          bytes.length < 44 ||
+          bytes.toString('ascii', 0, 4) !== 'RIFF' ||
+          bytes.toString('ascii', 8, 12) !== 'WAVE'
+        )
+          throw new Error('El sonido no es un WAV válido.');
       }
       if (/\.(svg|png|jpe?g|webp)$/.test(path)) {
         const metadata = await sharp(await readFile(file)).metadata();
@@ -112,12 +110,7 @@ export async function validateBrand(
     config.attract.media.some((path) => !/\.(svg|png|jpe?g|webp)$/.test(path))
   )
     throw new Error('attract.media solo admite imágenes en modo slideshow.');
-  const colors = config.theme.colors;
-  for (const [pair, first, second] of [
-    ['primary/onPrimary', colors.primary, colors.onPrimary],
-    ['background/text', colors.background, colors.text],
-  ]) {
-    const ratio = contrastRatio(first, second);
+  for (const { pair, ratio } of reviewContrast(config)) {
     if (ratio < 4.5)
       warn(
         `Advertencia de contraste ${pair}: ${ratio.toFixed(2)}:1 (mínimo recomendado 4.5:1).`,

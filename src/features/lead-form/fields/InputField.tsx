@@ -34,7 +34,7 @@ export function InputField({
       </label>
       <input
         {...attributes}
-        data-lead-field
+        data-lead-field={field.id}
         id={inputName}
         name={inputName}
         type={field.type}

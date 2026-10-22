@@ -12,7 +12,7 @@ export const brandIdSchema = z
 const assetPath = z
   .string()
   .regex(
-    /^assets\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:svg|png|jpe?g|webp|mp4|woff2)$/,
+    /^assets\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:svg|png|jpe?g|webp|mp4|woff2|wav)$/,
     'Debe ser una ruta local dentro de assets/ (sin URLs ni ..).',
   );
 const imagePath = assetPath.refine(
@@ -183,6 +183,17 @@ export const brandSchema = z.strictObject({
       invalidMoveAnimationMs: positiveInt.default(120),
       victoryAnimationMs: positiveInt.default(400),
       swipeThresholdPx: positiveInt.default(24),
+      sounds: z
+        .strictObject({
+          enabled: z.boolean(),
+          move: assetPath.refine((path) => path.endsWith('.wav')).optional(),
+          win: assetPath.refine((path) => path.endsWith('.wav')).optional(),
+        })
+        .refine(
+          (sounds) => !sounds.enabled || Boolean(sounds.move && sounds.win),
+          'sounds necesita move y win cuando está habilitado.',
+        )
+        .default({ enabled: false }),
     })
     .refine(
       (game) =>
@@ -201,6 +212,7 @@ export const brandSchema = z.strictObject({
   kiosk: z
     .strictObject({
       orientation: z.enum(['landscape', 'portrait']),
+      splashMs: positiveInt.default(1200),
       inactivityMs: z.strictObject({
         form: positiveInt,
         countdown: positiveInt,
@@ -211,6 +223,25 @@ export const brandSchema = z.strictObject({
       }),
       warningMs: positiveInt,
       errorRecoveryMs: positiveInt.default(2000),
+      admin: z
+        .strictObject({
+          pinTimeoutMs: positiveInt,
+          resetHoldMs: positiveInt,
+          deleteHoldMs: positiveInt,
+          lockoutBaseMs: positiveInt,
+          lockoutMaxMs: positiveInt,
+          maxAttempts: positiveInt,
+          exportFreshMs: positiveInt,
+        })
+        .default({
+          pinTimeoutMs: 20000,
+          resetHoldMs: 2000,
+          deleteHoldMs: 3000,
+          lockoutBaseMs: 30000,
+          lockoutMaxMs: 900000,
+          maxAttempts: 3,
+          exportFreshMs: 600000,
+        }),
       adminHotspot: z.enum([
         'top-right',
         'top-left',

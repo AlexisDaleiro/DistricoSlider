@@ -30,6 +30,15 @@ body,
 body {
   margin: 0;
 }
+button {
+  min-width: 48px;
+  min-height: 48px;
+}
+button:focus-visible,
+input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 3px;
+}
 .kiosk-overlay {
   @apply fixed inset-0 z-50 grid place-items-center bg-bg/95 px-5 font-body text-fg;
 }

@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useBrand } from '../../brand/BrandProvider';
 import { t } from '../../brand/t';
-import { isSolved, moveByDirection, slideLineTo } from './engine/board';
+import {
+  createSolved,
+  isSolved,
+  moveByDirection,
+  slideLineTo,
+} from './engine/board';
+import { QA_ENABLED } from '../../qa/config';
+import { useGameSounds } from './useGameSounds';
 import type { Direction, PuzzleState } from './engine/types';
 import { HUD } from './ui/HUD';
 import { PuzzleBoard } from './ui/PuzzleBoard';
@@ -28,6 +35,7 @@ export function GameScreen({
   onFinish,
 }: Props) {
   const { game } = useBrand();
+  const playSound = useGameSounds();
   const boardId = useId();
   const [state, setState] = useState(initialState);
   const [moves, setMoves] = useState(0);
@@ -100,6 +108,7 @@ export function GameScreen({
       setState(next.state);
       setMoves(nextMoves);
       if (isSolved(next.state)) {
+        playSound('win');
         outcome.current = {
           status: 'completed',
           durationMs: stop(),
@@ -108,9 +117,17 @@ export function GameScreen({
         current.current.phase = 'settling';
         setPhase('settling');
         setPreview(false);
-      }
+      } else playSound('move');
     },
-    [preview, game.maxDurationSec, getElapsedMs, timeout, stop, start],
+    [
+      preview,
+      game.maxDurationSec,
+      getElapsedMs,
+      timeout,
+      stop,
+      start,
+      playSound,
+    ],
   );
   const tap = useCallback(
     (position: number) =>
@@ -194,6 +211,20 @@ export function GameScreen({
         >
           {finished ? t('game.playAgain') : t('common.finish')}
         </button>
+        {QA_ENABLED && (
+          <button
+            data-qa-solve
+            type="button"
+            className="game-button mt-3 w-full bg-secondary text-on-secondary"
+            disabled={phase !== 'playing' || preview}
+            onClick={() => {
+              if (QA_ENABLED)
+                applyMove({ state: createSolved(state.size), moved: 1 });
+            }}
+          >
+            {t('qa.solve')}
+          </button>
+        )}
       </section>
     </main>
   );

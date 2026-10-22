@@ -125,3 +125,13 @@ it('el bajo contraste avisa y permite continuar', async () => {
   expect(contrastRatio('#000000', '#FFFFFF')).toBeCloseTo(21);
   expect(contrastRatio('#FFFFFF', '#000000')).toBeCloseTo(21);
 });
+
+it('rechaza un sonido local corrupto aunque esté deshabilitado', async () => {
+  await writeFile(
+    join(root, 'brands/demo/assets/sounds/win.wav'),
+    'RIFFincorrecto',
+  );
+  await expect(validateBrand('demo', root)).rejects.toThrow(
+    'El sonido no es un WAV válido',
+  );
+});

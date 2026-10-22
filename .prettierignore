@@ -5,3 +5,8 @@ package-lock.json
 brief base
 brands/**/assets
 artifacts
+android
+.android-sdk
+.android-assets
+.android-keys
+.gradle-cache

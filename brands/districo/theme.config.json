@@ -129,7 +129,12 @@
     "tileAnimationMs": 130,
     "invalidMoveAnimationMs": 120,
     "victoryAnimationMs": 400,
-    "swipeThresholdPx": 24
+    "swipeThresholdPx": 24,
+    "sounds": {
+      "enabled": false,
+      "move": "assets/sounds/move.wav",
+      "win": "assets/sounds/win.wav"
+    }
   },
   "leaderboard": {
     "size": 10,
@@ -151,7 +156,17 @@
     "errorRecoveryMs": 2000,
     "adminHotspot": "top-right",
     "adminTapCount": 5,
-    "adminTapWindowMs": 3000
+    "adminTapWindowMs": 3000,
+    "admin": {
+      "pinTimeoutMs": 20000,
+      "resetHoldMs": 2000,
+      "deleteHoldMs": 3000,
+      "lockoutBaseMs": 30000,
+      "lockoutMaxMs": 900000,
+      "maxAttempts": 3,
+      "exportFreshMs": 600000
+    },
+    "splashMs": 1200
   },
   "export": {
     "filePrefix": "leads_districo",

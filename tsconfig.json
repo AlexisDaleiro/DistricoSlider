@@ -16,5 +16,5 @@
     "types": ["vite/client", "node"],
     "paths": { "@brand/*": ["./brands/demo/*"] }
   },
-  "include": ["src", "scripts", "vite.config.ts"]
+  "include": ["src", "scripts", "vite.config.ts", "capacitor.config.ts"]
 }

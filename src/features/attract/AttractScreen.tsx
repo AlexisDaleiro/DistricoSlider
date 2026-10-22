@@ -2,19 +2,25 @@ import { useBrand } from '../../brand/BrandProvider';
 import { t } from '../../brand/t';
 import { AttractMedia } from './AttractMedia';
 import { BrandHeader } from '../../shared/ui/BrandHeader';
+import { AdminHotspot } from '../admin/AdminHotspot';
 
 export function AttractScreen({
   onStart,
   onLeaderboard,
   startError,
+  onAdmin,
+  gridSize,
 }: {
   onStart: () => void;
   onLeaderboard: () => void;
   startError: boolean;
+  onAdmin?: () => void;
+  gridSize?: 3 | 4;
 }) {
   const brand = useBrand();
   return (
     <div className="min-h-dvh cursor-pointer" onClick={onStart}>
+      {onAdmin && <AdminHotspot onUnlock={onAdmin} />}
       <BrandHeader />
       <main className="game-layout">
         <section className="order-2 max-w-lg lg:order-1">
@@ -55,7 +61,7 @@ export function AttractScreen({
           <figcaption className="flex items-center justify-between gap-3 px-2 py-4 text-sm">
             <span>{t('showcase.imageCaption')}</span>
             <span className="rounded-full bg-secondary px-3 py-1 font-bold text-on-secondary">
-              {t('game.grid', { size: brand.game.gridSize })}
+              {t('game.grid', { size: gridSize ?? brand.game.gridSize })}
             </span>
           </figcaption>
         </figure>

@@ -48,6 +48,7 @@ export const PuzzleBoard = memo(function PuzzleBoard({
     <div
       className="puzzle-stage"
       style={{
+        minWidth: state.size * 48,
         animationName:
           invalidMoveRevision === 0
             ? 'none'

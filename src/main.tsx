@@ -6,7 +6,10 @@ import { brand } from './brand/brand';
 import { applyTheme } from './brand/applyTheme';
 import { BrandProvider } from './brand/BrandProvider';
 import './styles/index.css';
+import { installNativeFilePlatform } from './data/files/nativePlatform';
+import { QA_ENABLED } from './qa/config';
 
+if (!QA_ENABLED) installNativeFilePlatform();
 applyTheme(brand);
 
 createRoot(document.getElementById('root')!).render(

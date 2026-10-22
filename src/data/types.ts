@@ -53,3 +53,14 @@ export interface NewLeadInput {
   consentVersion: string;
   marketingOptIn: boolean;
 }
+export interface PinHash {
+  salt: number[];
+  hash: number[];
+  iterations: number;
+  isDefault: boolean;
+}
+export interface PinState {
+  failures: number;
+  level: number;
+  lockedUntil: number;
+}
