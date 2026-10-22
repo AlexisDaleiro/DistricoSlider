@@ -97,10 +97,11 @@ export async function runSoak(options: {
         pollMs,
         'attract',
       );
-      clickText(brand.attract.cta);
+      if (!brand.gameHub) clickText(brand.attract.cta);
       await until(
         () =>
-          flowStore.getState().screen === 'form' &&
+          flowStore.getState().screen ===
+            (brand.gameHub ? 'attract' : 'form') &&
           Boolean(document.querySelector('form')),
         signal,
         pollMs,
@@ -153,6 +154,22 @@ export async function runSoak(options: {
       );
       markActivity();
       document.querySelector<HTMLFormElement>('form')!.requestSubmit();
+      if (brand.gameHub) {
+        await until(
+          () =>
+            flowStore.getState().screen === 'form' &&
+            Array.from(
+              document.querySelectorAll<HTMLButtonElement>('main button'),
+            ).some(
+              (button) =>
+                button.textContent?.trim() === '¡Jugar!' && !button.disabled,
+            ),
+          signal,
+          pollMs,
+          'instructions',
+        );
+        clickText('¡Jugar!');
+      }
       await until(
         () => flowStore.getState().screen === 'countdown',
         signal,
@@ -163,7 +180,9 @@ export async function runSoak(options: {
       const lead = await db.leads.where('uuid').equals(leadUuid!).first();
       const started = await sessionsRepo.get(sessionUuid!);
       if (
-        lead?.email !== email ||
+        (brand.gameHub
+          ? lead?.phone !== '+59899123456'
+          : lead?.email !== email) ||
         started?.status !== 'started' ||
         started.leadUuid !== leadUuid
       )

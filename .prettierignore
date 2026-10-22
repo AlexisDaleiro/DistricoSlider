@@ -10,3 +10,4 @@ android
 .android-assets
 .android-keys
 .gradle-cache
+src/integrations/gamehub/vendor/shared-sdk.js

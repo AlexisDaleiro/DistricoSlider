@@ -15,6 +15,7 @@ export default tseslint.config(
       '.android-assets/**',
       '.android-keys/**',
       '.gradle-cache/**',
+      'src/integrations/gamehub/vendor/**',
     ],
   },
   js.configs.recommended,

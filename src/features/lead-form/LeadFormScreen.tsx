@@ -13,6 +13,7 @@ interface Props {
   ready: boolean;
   imageError: boolean;
   onRetryImage: () => void;
+  identityLocked?: boolean;
 }
 export function LeadFormScreen({
   onSubmit,
@@ -20,6 +21,7 @@ export function LeadFormScreen({
   ready,
   imageError,
   onRetryImage,
+  identityLocked = false,
 }: Props) {
   const brand = useBrand();
   const schema = useMemo(
@@ -34,7 +36,7 @@ export function LeadFormScreen({
   const [marketingOptIn, setMarketing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const locked = useRef(false);
   const validate = (only?: string) => {
     const result = schema.safeParse({ fields, consent, marketingOptIn });
@@ -65,6 +67,13 @@ export function LeadFormScreen({
       <section className="rounded-brand bg-surface p-6 sm:p-8">
         <p className="game-eyebrow">{t('game.eyebrow')}</p>
         <h1 className="game-heading mt-4">{brand.form.title}</h1>
+        {brand.gameHub && (
+          <p className="mt-4 text-muted">
+            Registraremos tu nombre, celular y los resultados de tus partidas en
+            la central de juegos. Uruguay por defecto: 099 123 456. Para otro
+            país, ingresá + y su prefijo internacional.
+          </p>
+        )}
         <form
           className="mt-7 space-y-5"
           noValidate
@@ -76,11 +85,15 @@ export function LeadFormScreen({
             if (!result.success) return;
             locked.current = true;
             setSaving(true);
-            setSaveError(false);
+            setSaveError(null);
             try {
               await onSubmit(result.data);
-            } catch {
-              setSaveError(true);
+            } catch (error) {
+              setSaveError(
+                brand.gameHub && error instanceof Error
+                  ? error.message
+                  : t('form.saveError'),
+              );
             } finally {
               locked.current = false;
               setSaving(false);
@@ -101,7 +114,7 @@ export function LeadFormScreen({
                 inputName={`${prefix}-${field.id}`}
                 value={fields[field.id] ?? ''}
                 error={errors[field.id]}
-                disabled={saving}
+                disabled={saving || identityLocked}
                 onChange={(value) =>
                   setFields((current) => ({ ...current, [field.id]: value }))
                 }
@@ -114,12 +127,12 @@ export function LeadFormScreen({
             id={`${prefix}-consent`}
             text={brand.form.consent.text}
             checked={consent}
-            disabled={saving}
+            disabled={saving || identityLocked}
             error={errors.consent}
             onChange={setConsent}
             onBlur={() => validate('consent')}
           />
-          {brand.form.marketingOptIn.enabled && (
+          {!brand.gameHub && brand.form.marketingOptIn.enabled && (
             <ConsentCheckbox
               id={`${prefix}-marketing`}
               text={brand.form.marketingOptIn.text}
@@ -130,7 +143,7 @@ export function LeadFormScreen({
           )}
           {saveError && (
             <p role="alert" className="text-sm text-danger">
-              {t('form.saveError')}
+              {saveError}
             </p>
           )}
           {imageError && (
@@ -152,17 +165,21 @@ export function LeadFormScreen({
           >
             {saving
               ? t('form.saving')
-              : !ready && !imageError
-                ? t('game.loading')
-                : brand.form.submit}
+              : brand.gameHub && !ready
+                ? 'Conexión pendiente'
+                : !ready && !imageError
+                  ? t('game.loading')
+                  : brand.form.submit}
           </button>
           <button
             type="button"
             className="game-button w-full text-muted"
             onClick={onCancel}
-            disabled={saving}
+            disabled={saving && !brand.gameHub}
           >
-            {t('form.cancel')}
+            {brand.gameHub
+              ? 'Cambiar participante / borrar datos'
+              : t('form.cancel')}
           </button>
         </form>
       </section>

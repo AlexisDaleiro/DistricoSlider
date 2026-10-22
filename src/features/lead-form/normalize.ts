@@ -20,7 +20,7 @@ export function normalize(
     eventId: brand.event.id,
     brandId: brand.brand.id,
     name: values.fields.name.trim(),
-    email: normalizeEmail(values.fields.email),
+    email: normalizeEmail(values.fields.email ?? ''),
     company: values.fields.company?.trim() || undefined,
     phone: values.fields.phone
       ? (normalizePhone(values.fields.phone, phoneField?.defaultCountry) ??

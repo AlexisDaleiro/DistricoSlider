@@ -9,6 +9,10 @@ const compare = (a: GameSession, b: GameSession) =>
   a.durationMs! - b.durationMs! ||
   a.moves! - b.moves! ||
   a.finishedAt! - b.finishedAt!;
+const participantKey = (lead: Lead) =>
+  lead.emailNormalized
+    ? `email:${lead.emailNormalized}`
+    : `phone:${lead.phone ?? lead.uuid}`;
 const resetKey = (eventId: string, dayKey: string) =>
   `leaderboardResetAt:${eventId}:${dayKey}`;
 
@@ -45,9 +49,9 @@ export function createLeaderboardRepo(database: KioskDB) {
     for (const session of sessions) {
       const lead = leads.get(session.leadUuid);
       if (!lead) continue;
-      const previous = best.get(lead.emailNormalized);
+      const previous = best.get(participantKey(lead));
       if (!previous || compare(session, previous.session) < 0)
-        best.set(lead.emailNormalized, { session, lead });
+        best.set(participantKey(lead), { session, lead });
     }
     return [...best.values()]
       .sort((a, b) => compare(a.session, b.session))
@@ -80,7 +84,7 @@ export function createLeaderboardRepo(database: KioskDB) {
         Number.MAX_SAFE_INTEGER,
       );
       const index = entries.findIndex(
-        (entry) => entry.lead.emailNormalized === lead.emailNormalized,
+        (entry) => participantKey(entry.lead) === participantKey(lead),
       );
       return index < 0 ? null : index + 1;
     },

@@ -52,6 +52,22 @@ const field = z
 
 export const brandSchema = z.strictObject({
   schemaVersion: z.literal(1),
+  gameHub: z
+    .strictObject({
+      endpoint: z.string().trim(),
+      gameKey: z.string().trim(),
+      brandId: z.string().trim(),
+      brandName: z.string().trim(),
+      gameId: z.string().trim(),
+      gameName: z.string().trim(),
+      gameVersion: z.string().trim().min(1).max(30).optional(),
+      defaultCallingCode: z
+        .string()
+        .regex(/^[1-9]\d{0,2}$/)
+        .optional(),
+      allowPreview: z.boolean(),
+    })
+    .optional(),
   brand: z.strictObject({
     id: brandIdSchema,
     name: text,
@@ -137,14 +153,22 @@ export const brandSchema = z.strictObject({
             message: 'Debe existir exactamente un campo name de tipo text.',
           });
         if (
-          fields.filter(
+          (fields.filter(
             (entry) => entry.id === 'email' && entry.type === 'email',
           ).length !== 1 ||
-          fields.filter((entry) => entry.type === 'email').length !== 1
+            fields.filter((entry) => entry.type === 'email').length !== 1) &&
+          !(
+            fields.every((entry) => entry.type !== 'email') &&
+            fields.some(
+              (entry) =>
+                entry.id === 'phone' && entry.type === 'tel' && entry.required,
+            )
+          )
         )
           ctx.addIssue({
             code: 'custom',
-            message: 'Debe existir exactamente un campo email de tipo email.',
+            message:
+              'Se requiere email obligatorio o celular obligatorio, sin emails adicionales.',
           });
       }),
     consent: z.strictObject({ required: z.boolean(), version: text, text }),

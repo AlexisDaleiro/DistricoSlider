@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "gamehub:test-central": "tsx scripts/test-gamehub-central.ts",
     "brand:validate": "tsx scripts/validate-brand.ts",
     "assets:generate": "tsx scripts/generate-placeholders.ts",
     "brand:build": "tsx scripts/build-brand.ts",

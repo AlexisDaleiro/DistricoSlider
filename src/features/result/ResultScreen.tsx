@@ -10,11 +10,13 @@ export function ResultScreen({
   imageUrl,
   onLeaderboard,
   onFinish,
+  onReplay,
 }: {
   session: GameSession;
   imageUrl: string;
   onLeaderboard: () => void;
   onFinish: () => void;
+  onReplay?: () => void;
 }) {
   const brand = useBrand();
   const [rank, setRank] = useState<number | null | undefined>(undefined);
@@ -83,6 +85,15 @@ export function ResultScreen({
                   : t('result.outOfTop', { size: brand.leaderboard.size })}
             </p>
           ))}
+        {onReplay && (
+          <button
+            type="button"
+            className="game-button mt-7 w-full bg-secondary text-on-secondary"
+            onClick={onReplay}
+          >
+            Jugar otra ronda
+          </button>
+        )}
         <button
           type="button"
           className="game-button mt-7 w-full bg-primary text-on-primary"
@@ -95,7 +106,7 @@ export function ResultScreen({
           className="game-button mt-3 w-full text-muted"
           onClick={onFinish}
         >
-          {t('common.finish')}
+          {onReplay ? 'Cambiar participante' : t('common.finish')}
         </button>
       </section>
     </main>

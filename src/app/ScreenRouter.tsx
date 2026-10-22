@@ -22,9 +22,18 @@ import { dayKey } from '../shared/lib/time';
 import { recordError } from '../kiosk/auditError';
 import { AdminScreen } from '../features/admin/AdminScreen';
 import { settingsRepo } from '../data/repos/settingsRepo';
+import { CentralRouter } from '../integrations/gamehub/CentralRouter';
 
 /** El store solo conserva IDs; borrador, tablero y recursos viven en este montaje. */
 export function ScreenRouter({ visit }: { visit: number }) {
+  const brand = useBrand();
+  return brand.gameHub ? (
+    <CentralRouter visit={visit} />
+  ) : (
+    <LocalScreenRouter visit={visit} />
+  );
+}
+function LocalScreenRouter({ visit }: { visit: number }) {
   const brand = useBrand();
   const screen = useFlowStore((state) => state.screen);
   const [image] = useState(() => selectGameImage(brand.game.images));

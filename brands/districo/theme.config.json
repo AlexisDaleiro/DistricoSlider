@@ -1,5 +1,16 @@
 {
   "schemaVersion": 1,
+  "gameHub": {
+    "endpoint": "https://script.google.com/macros/s/AKfycbyEasUVM53vQA3QbCkak3Zqg_pMYvFBLZlWmQr30YZL7gNeTYYzPVfv1WCBIoY2rdam/exec",
+    "gameKey": "b5ee5aca-9981-49bb-a51f-b830758594fa",
+    "brandId": "biofresh",
+    "brandName": "Biofresh",
+    "gameId": "biofresh-puzzle",
+    "gameName": "Puzzle",
+    "gameVersion": "1.0.0",
+    "defaultCallingCode": "598",
+    "allowPreview": false
+  },
   "brand": {
     "id": "districo",
     "name": "DISTRICO",
@@ -50,40 +61,34 @@
     "cta": "Empezar el desafío"
   },
   "form": {
-    "title": "Dejanos tus datos para participar",
+    "title": "Registrate para participar",
     "fields": [
       {
         "id": "name",
         "type": "text",
         "label": "Nombre y apellido",
         "required": true,
-        "minLength": 3,
+        "minLength": 2,
         "maxLength": 80
-      },
-      {
-        "id": "email",
-        "type": "email",
-        "label": "Email",
-        "required": true
       },
       {
         "id": "phone",
         "type": "tel",
-        "label": "Teléfono",
-        "required": false,
+        "label": "Celular",
+        "required": true,
         "defaultCountry": "UY"
       }
     ],
     "consent": {
       "required": true,
-      "version": "2026-10-01",
-      "text": "Acepto el tratamiento de mis datos para participar. Texto de demostración: reemplazar antes de un evento."
+      "version": "2026-10-22",
+      "text": "Acepto que se registren mi nombre, celular y resultados en la central de juegos para gestionar mi participación."
     },
     "marketingOptIn": {
-      "enabled": true,
+      "enabled": false,
       "text": "Quiero recibir novedades y promociones."
     },
-    "submit": "¡Jugar!"
+    "submit": "Registrarme y continuar"
   },
   "game": {
     "gridSize": 3,
@@ -132,7 +137,7 @@
   "leaderboard": {
     "size": 10,
     "nameFormat": "firstNameLastInitial",
-    "showCompany": true,
+    "showCompany": false,
     "repeatPlayers": "bestScoreOnly"
   },
   "kiosk": {

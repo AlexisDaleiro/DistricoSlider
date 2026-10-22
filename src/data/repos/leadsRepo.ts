@@ -11,11 +11,14 @@ export function createLeadsRepo(
   afterSave?: (eventId: string) => void,
 ) {
   async function create(input: NewLeadInput): Promise<Lead> {
-    const email = z.email().parse(normalizeEmail(input.email));
+    const email = input.email.trim()
+      ? z.email().parse(normalizeEmail(input.email))
+      : '';
     const name = z.string().trim().min(1).parse(input.name);
     const phone = input.phone?.trim() ? normalizePhone(input.phone) : undefined;
     if (phone === null)
       throw new Error('El teléfono debe estar normalizado a E.164.');
+    if (!email && !phone) throw new Error('Se requiere email o celular.');
     const now = Date.now();
     const lead: Lead = {
       ...input,
@@ -40,6 +43,26 @@ export function createLeadsRepo(
     return { ...lead, id };
   }
   return {
+    registerParticipant: (input: NewLeadInput) =>
+      database.transaction('rw', database.leads, async () => {
+        if (!input.phone) throw new Error('Se requiere celular.');
+        const existing = await database.leads
+          .where('eventId')
+          .equals(input.eventId)
+          .filter((lead) => lead.phone === input.phone)
+          .first();
+        if (existing) {
+          const updated = {
+            ...existing,
+            name: input.name,
+            consent: input.consent,
+            consentVersion: input.consentVersion,
+          };
+          await database.leads.put(updated);
+          return updated;
+        }
+        return create(input);
+      }),
     create: async (input: NewLeadInput) => {
       const lead = await create(input);
       afterSave?.(input.eventId);

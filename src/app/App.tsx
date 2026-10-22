@@ -72,9 +72,14 @@ export function App() {
     void flowStore.getState().resetToAttract('inactivity');
   }, []);
   const inactivity = useInactivity({
-    timeoutMs: screen === 'attract' ? 0 : brand.kiosk.inactivityMs[screen],
+    timeoutMs:
+      screen === 'attract'
+        ? brand.gameHub
+          ? brand.kiosk.inactivityMs.form
+          : 0
+        : brand.kiosk.inactivityMs[screen],
     warningMs: brand.kiosk.warningMs,
-    enabled: dataReady && screen !== 'attract',
+    enabled: dataReady && (screen !== 'attract' || Boolean(brand.gameHub)),
     onTimeout,
     activityKey: `${screen}:${visit}`,
   });
@@ -86,7 +91,9 @@ export function App() {
         </Suspense>
       )}
       <div inert={inactivity.secondsLeft !== null}>
-        {(!dataReady || screen !== 'attract') && <BrandHeader />}
+        {(!dataReady || screen !== 'attract' || brand.gameHub) && (
+          <BrandHeader />
+        )}
         {!dataReady ? (
           <main className="mx-auto max-w-xl px-5 py-12">
             <section

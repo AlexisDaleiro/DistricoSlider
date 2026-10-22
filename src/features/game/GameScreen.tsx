@@ -26,6 +26,7 @@ interface Props {
   imageUrl: string;
   onExit: () => void;
   onFinish?: (outcome: GameOutcome) => void;
+  onProgress?: (score: { durationMs: number; moves: number }) => void;
 }
 
 export function GameScreen({
@@ -33,6 +34,7 @@ export function GameScreen({
   imageUrl,
   onExit,
   onFinish,
+  onProgress,
 }: Props) {
   const { game } = useBrand();
   const playSound = useGameSounds();
@@ -70,6 +72,9 @@ export function GameScreen({
     onTimeout: timeout,
   });
   const { start, stop, getElapsedMs } = timer;
+  useEffect(() => {
+    onProgress?.({ durationMs: Math.round(getElapsedMs()), moves });
+  }, [timer.elapsedMs, moves, getElapsedMs, onProgress]);
 
   useEffect(() => {
     if (phase !== 'settling') return;

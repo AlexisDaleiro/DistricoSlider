@@ -12,6 +12,8 @@ export function normalizePhone(
     defaultCountry && isSupportedCountry(defaultCountry)
       ? defaultCountry
       : undefined;
-  const phone = parsePhoneNumberFromString(value.trim(), country);
+  const input = value.trim().replace(/^00/, '+');
+  if (!/^\+?[\d\s().-]+$/.test(input)) return null;
+  const phone = parsePhoneNumberFromString(input, country);
   return phone?.isValid() ? phone.number : null;
 }

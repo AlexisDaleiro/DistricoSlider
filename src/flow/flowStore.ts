@@ -4,9 +4,15 @@ import { sessionsRepo } from '../data/repos/sessionsRepo';
 import { markActivity } from '../kiosk/activityTracker';
 import { recordAudit, recordError } from '../kiosk/auditError';
 import { TRANSITIONS, type Screen } from './transitions';
+import { resetParticipation } from './participationLifecycle';
 
 export type ResetReason =
-  'inactivity' | 'finish' | 'cancel' | 'render_error' | 'invalid_transition';
+  | 'inactivity'
+  | 'finish'
+  | 'cancel'
+  | 'render_error'
+  | 'invalid_transition'
+  | 'page_exit';
 interface FlowState {
   screen: Screen;
   leadUuid: string | null;
@@ -41,6 +47,7 @@ export function createFlowStore(development = import.meta.env.DEV) {
     },
     resetToAttract: async (reason) => {
       const { sessionUuid, screen, visit } = get();
+      resetParticipation(reason);
       // La privacidad no espera una escritura: también se resetea si IDB está colgado.
       if (document.activeElement instanceof HTMLElement)
         document.activeElement.blur();

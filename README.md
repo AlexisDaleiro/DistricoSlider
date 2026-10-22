@@ -1,5 +1,7 @@
 # Kiosk Puzzle — Fases 1 a 8
 
+Districo incorpora el registro obligatorio de nombre y celular y el protocolo de la central Google Sheets + Apps Script, con la configuración publicada de Biofresh / Puzzle (`biofresh-puzzle`). Ver [GAMEHUB.md](GAMEHUB.md) para probar y compilar. Su producción requiere registro confirmado por la central; el modo offline descrito en las fases anteriores corresponde al flujo local de demo y a las pruebas explícitas.
+
 Scaffolding white-label offline, motor puro y UI jugable de puzzle deslizable 3×3 / 4×4, según [el spec recibido](brief%20base/SPEC_KIOSK_PUZZLE.md). Incluye formulario configurable, persistencia IndexedDB y flujo ATTRACT → FORM → COUNTDOWN → GAME → RESULT → LEADERBOARD. El lead y su sesión se guardan juntos antes del countdown; el resultado se guarda antes de mostrar RESULT. Incluye kiosco con inactividad, admin con PIN, exportación offline CSV/XLSX y APK Android por marca.
 
 Requisitos: Node.js 24+ y npm. Las versiones exactas verificadas están en `package.json`, `package-lock.json` y [DECISIONS.md](DECISIONS.md).

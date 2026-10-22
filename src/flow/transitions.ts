@@ -12,7 +12,7 @@ export const TRANSITIONS: Record<Screen, Screen[]> = {
   form: ['countdown', 'attract'],
   countdown: ['game', 'attract'],
   game: ['result', 'attract'],
-  result: ['leaderboard', 'attract'],
+  result: ['leaderboard', 'countdown', 'attract'],
   leaderboard: ['attract'],
   admin: ['attract'],
 };
