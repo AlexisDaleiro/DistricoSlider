@@ -78,6 +78,7 @@ export function LeadFormScreen({
           className="mt-7 space-y-5"
           noValidate
           autoComplete="off"
+          aria-busy={saving}
           onSubmit={async (event) => {
             event.preventDefault();
             if (locked.current || !ready) return;
@@ -163,7 +164,7 @@ export function LeadFormScreen({
             className="game-button w-full bg-primary text-on-primary"
             disabled={saving || !ready}
           >
-            {saving
+            {saving && !brand.gameHub
               ? t('form.saving')
               : brand.gameHub && !ready
                 ? 'Conexión pendiente'

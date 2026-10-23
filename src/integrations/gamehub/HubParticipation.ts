@@ -62,6 +62,7 @@ export class HubParticipation {
   private round: Round | null = null;
   private listeners = new Set<() => void>();
   private snapshot = '';
+  private pendingKey = '';
   private tracked = new Set<string>();
   readonly preview: boolean;
   readonly missing: string[];
@@ -80,10 +81,15 @@ export class HubParticipation {
     };
   };
   getSnapshot = () => this.snapshot;
-  refresh = () => {
-    const rejected = [...this.tracked].some(
+  getSyncSnapshot = () => `${this.snapshot}\n${this.pendingKey}`;
+  get hasRejected() {
+    return [...this.tracked].some(
       (id) => this.client.receipts.get(id)?.ok === false,
     );
+  }
+  refresh = () => {
+    const rejected = this.hasRejected;
+    const pendingKey = this.client.queue[0]?.event.eventId ?? '';
     const next = this.preview
       ? 'Modo de prueba: los datos no se envían ni se guardan en la central.'
       : this.missing.length
@@ -95,8 +101,9 @@ export class HubParticipation {
             : this.tracked.size
               ? 'Envíos confirmados por la central.'
               : 'El registro requiere conexión con la central.';
-    if (next !== this.snapshot) {
+    if (next !== this.snapshot || pendingKey !== this.pendingKey) {
       this.snapshot = next;
+      this.pendingKey = pendingKey;
       this.listeners.forEach((listener) => listener());
     }
   };

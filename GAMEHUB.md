@@ -35,6 +35,8 @@ El puzzle conserva su ranking por **menor tiempo**, luego **menos movimientos**.
 
 ## Desconexión y reintentos
 
+Los envíos normales y sus confirmaciones son silenciosos. El aviso de envío pendiente y el botón de reintento aparecen solo después de 10 segundos, configurables en gameHub.syncFeedbackDelayMs. Se ocultan al confirmarse y cada nuevo envío vuelve a esperar su plazo. El modo de prueba, la configuración incompleta y los rechazos siguen indicándose; jugar continúa requiriendo un registro confirmado.
+
 El SDK usa un iframe y `postMessage` con nonce y comprobación del origen y de la ventana del puente. Los datos personales viajan en el mensaje, nunca en la URL. Cada reintento conserva **eventId, fecha, sesión, ronda y todo el contenido**. Se reintenta al recuperar conexión, cada 20 segundos y mediante el botón de reintento.
 
 La cola original del SDK vive en `sessionStorage`, con máximo de 80 eventos y descarte de registros de más de 6 horas al restaurar la cola. El formulario bloquea los datos de un registro ya enviado para reintentarlo sin cambiarlos; se puede cancelar y cambiar de participante. Las nuevas rondas pueden continuar sin conexión después de una inscripción confirmada. Los resultados locales siguen disponibles, pero la pantalla indica por separado si la central todavía tiene envíos pendientes o rechazados. Cerrar definitivamente la pestaña puede perder la cola; no se promete entrega posterior al cierre. El evento de salida se encola al recibir `pagehide`.

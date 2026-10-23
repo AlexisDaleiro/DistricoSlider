@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { asset } from '../../brand/brand';
 import { useBrand } from '../../brand/BrandProvider';
 import { t } from '../../brand/t';
@@ -29,12 +23,12 @@ import { settingsRepo } from '../../data/repos/settingsRepo';
 import type { Lead, GameSession } from '../../data/types';
 import { dayKey } from '../../shared/lib/time';
 import { getGameHub } from './runtime';
+import { HubSyncNotice } from './HubSyncNotice';
 
 export function CentralRouter({ visit }: { visit: number }) {
   const brand = useBrand();
   const hub = getGameHub();
   const screen = useFlowStore((state) => state.screen);
-  const status = useSyncExternalStore(hub.subscribe, hub.getSnapshot);
   const [identityLocked, setIdentityLocked] = useState(hub.identityLocked);
   const [lead, setLead] = useState<Lead | null>(null);
   const [session, setSession] = useState<GameSession | null>(null);
@@ -278,23 +272,7 @@ export function CentralRouter({ visit }: { visit: number }) {
   return (
     <>
       {!['attract', 'leaderboard', 'admin'].includes(screen) && (
-        <aside
-          className="mx-auto max-w-xl px-5 pt-5 text-sm"
-          aria-label="Estado de conexión"
-        >
-          <p role="status">{status}</p>
-          {hub.client.queue.length > 0 && (
-            <button
-              type="button"
-              className="game-button mt-2"
-              onClick={() => {
-                void hub.retry().catch(() => {});
-              }}
-            >
-              Reintentar envíos a la central
-            </button>
-          )}
-        </aside>
+        <HubSyncNotice hub={hub} />
       )}
       {error && (
         <p role="alert" className="mx-auto max-w-xl px-5 pt-4 text-danger">

@@ -9,6 +9,7 @@ export interface HubConfig {
   gameName: string;
   gameVersion: string;
   defaultCallingCode?: string;
+  syncFeedbackDelayMs?: number;
   allowPreview: boolean;
 }
 export interface Participant {

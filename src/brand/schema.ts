@@ -61,6 +61,7 @@ export const brandSchema = z.strictObject({
       gameId: z.string().trim(),
       gameName: z.string().trim(),
       gameVersion: z.string().trim().min(1).max(30).optional(),
+      syncFeedbackDelayMs: z.number().int().nonnegative().default(10000),
       defaultCallingCode: z
         .string()
         .regex(/^[1-9]\d{0,2}$/)

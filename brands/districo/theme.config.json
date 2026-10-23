@@ -9,6 +9,7 @@
     "gameName": "Puzzle",
     "gameVersion": "1.0.0",
     "defaultCallingCode": "598",
+    "syncFeedbackDelayMs": 10000,
     "allowPreview": false
   },
   "brand": {
