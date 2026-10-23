@@ -102,6 +102,7 @@ export async function validateBrand(
   }
   if (
     config.attract.mode === 'video' &&
+    config.attract.media.length > 0 &&
     !config.attract.media.some((path) => path.endsWith('.mp4'))
   )
     throw new Error('attract.media necesita un MP4 en modo video.');

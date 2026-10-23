@@ -55,7 +55,7 @@ afterEach(async () => {
 
 async function openForm() {
   fireEvent.click(
-    await screen.findByRole('button', { name: brand.attract.cta }),
+    await screen.findByRole('button', { name: brand.attract.startButton }),
   );
   await screen.findByLabelText('Nombre y apellido');
   fireEvent.change(screen.getByLabelText('Nombre y apellido'), {
@@ -115,12 +115,14 @@ it('espera decode y commit antes de countdown; Terminar abandona sin perder el l
   fireEvent.click(
     screen.getByRole('button', { name: brand.texts['common.finish'] }),
   );
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   await waitFor(async () =>
     expect((await db.sessions.toArray())[0].status).toBe('abandoned'),
   );
   expect(await db.leads.count()).toBe(1);
-  fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.attract.startButton }),
+  );
   expect(
     ((await screen.findByLabelText('Email')) as HTMLInputElement).value,
   ).toBe('');
@@ -157,9 +159,11 @@ it('el aviso conserva borrador al continuar, pero timeout limpia inputs, consent
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(email.value).toContain('ANA@EXAMPLE.COM');
   idle(brand.kiosk.inactivityMs.form);
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   expect(document.activeElement).not.toBe(email);
-  fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.attract.startButton }),
+  );
   const clean = (await screen.findByLabelText('Email')) as HTMLInputElement;
   expect(clean.value).toBe('');
   expect(clean.name).not.toBe(previousName);
@@ -182,7 +186,7 @@ it.each(['countdown', 'game'] as const)(
     idle(brand.kiosk.inactivityMs[phase] - brand.kiosk.warningMs);
     expect(screen.getByRole('dialog')).toBeTruthy();
     idle(brand.kiosk.warningMs);
-    await screen.findByRole('button', { name: brand.attract.cta });
+    await screen.findByRole('button', { name: brand.attract.startButton });
     await waitFor(async () =>
       expect((await db.sessions.toArray())[0].status).toBe('abandoned'),
     );
@@ -208,7 +212,7 @@ it.each(['result', 'leaderboard'] as const)(
     idle(brand.kiosk.inactivityMs[phase] - brand.kiosk.warningMs);
     expect(screen.getByRole('dialog')).toBeTruthy();
     idle(brand.kiosk.warningMs);
-    await screen.findByRole('button', { name: brand.attract.cta });
+    await screen.findByRole('button', { name: brand.attract.startButton });
     expect((await db.sessions.toArray())[0].status).toBe('completed');
     expect(await db.leads.count()).toBe(1);
   },
@@ -228,8 +232,10 @@ it('un commit tardío tras el reset conserva el lead, abandona esa sesión y no 
   await openForm();
   await submit();
   idle(brand.kiosk.inactivityMs.form);
-  await screen.findByRole('button', { name: brand.attract.cta });
-  fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
+  await screen.findByRole('button', { name: brand.attract.startButton });
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.attract.startButton }),
+  );
   await screen.findByLabelText('Email');
   await act(async () => {
     await commit?.();
@@ -260,7 +266,7 @@ it('una respuesta tardía de resultado no revive RESULT tras resetear', async ()
   solve();
   await waitFor(() => expect(complete).toBeDefined());
   idle(brand.kiosk.inactivityMs.game);
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   await act(async () => {
     await complete?.();
   });

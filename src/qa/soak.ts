@@ -97,11 +97,10 @@ export async function runSoak(options: {
         pollMs,
         'attract',
       );
-      if (!brand.gameHub) clickText(brand.attract.cta);
+      clickText(brand.attract.startButton);
       await until(
         () =>
-          flowStore.getState().screen ===
-            (brand.gameHub ? 'attract' : 'form') &&
+          flowStore.getState().screen === 'form' &&
           Boolean(document.querySelector('form')),
         signal,
         pollMs,
@@ -223,7 +222,7 @@ export async function runSoak(options: {
       );
       if (document.querySelector('main')!.textContent!.includes('@'))
         throw new Error(t('qa.badData'));
-      clickText(t('common.finish'));
+      clickText(brand.attract.backButton);
       await until(
         () =>
           flowStore.getState().screen === 'attract' &&

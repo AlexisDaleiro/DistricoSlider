@@ -128,6 +128,11 @@ for (const id of ['_template', 'demo']) {
       slideIntervalMs: 6000,
       headline: 'Cada pieza cuenta.',
       cta: 'Tocá para jugar',
+      startButton: 'Empezar juego',
+      rankingButton: 'Ver ranking',
+      backButton: 'Volver',
+      animation: 'puzzle-assemble',
+      animationCycleMs: 9000,
     },
     form: {
       title: 'Dejanos tus datos para participar',

@@ -113,7 +113,7 @@ export function LeaderboardScreen({
           type="button"
           onClick={onFinish}
         >
-          {t('common.finish')}
+          {brand.attract.backButton}
         </button>
       </section>
     </main>

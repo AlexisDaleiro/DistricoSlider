@@ -13,7 +13,7 @@ import { onParticipationReset } from '../../flow/participationLifecycle';
 import { LeadFormScreen } from '../../features/lead-form/LeadFormScreen';
 import { normalize } from '../../features/lead-form/normalize';
 import type { LeadFormValues } from '../../features/lead-form/buildLeadSchema';
-import { AdminHotspot } from '../../features/admin/AdminHotspot';
+import { AttractScreen } from '../../features/attract/AttractScreen';
 import { AdminScreen } from '../../features/admin/AdminScreen';
 import { CountdownScreen } from '../../features/game/CountdownScreen';
 import { GameScreen, type GameOutcome } from '../../features/game/GameScreen';
@@ -93,7 +93,6 @@ export function CentralRouter({ visit }: { visit: number }) {
     });
     if (!current()) return;
     setLead(registered);
-    flowStore.getState().go('form');
   };
   const startRound = async () => {
     if (locked.current || !lead || !hub.canPlay || !prepared.url) return;
@@ -166,22 +165,26 @@ export function CentralRouter({ visit }: { visit: number }) {
   if (screen === 'admin') content = <AdminScreen />;
   else if (screen === 'attract')
     content = (
-      <>
-        <AdminHotspot
-          onUnlock={() => {
-            hub.clear('admin');
-            flowStore.getState().go('admin');
-          }}
-        />
-        <LeadFormScreen
-          onSubmit={register}
-          onCancel={changeParticipant}
-          ready={hub.preview || hub.missing.length === 0}
-          imageError={false}
-          onRetryImage={() => {}}
-          identityLocked={identityLocked}
-        />
-      </>
+      <AttractScreen
+        prepared={prepared}
+        image={image}
+        gridSize={brand.game.gridSize}
+        startError={false}
+        onStart={() => flowStore.getState().go('form')}
+        onLeaderboard={() => flowStore.getState().go('leaderboard')}
+        onAdmin={() => flowStore.getState().go('admin')}
+      />
+    );
+  else if (screen === 'form' && !lead)
+    content = (
+      <LeadFormScreen
+        onSubmit={register}
+        onCancel={changeParticipant}
+        ready={hub.preview || hub.missing.length === 0}
+        imageError={false}
+        onRetryImage={() => {}}
+        identityLocked={identityLocked}
+      />
     );
   else if (screen === 'form')
     content = (
@@ -274,23 +277,25 @@ export function CentralRouter({ visit }: { visit: number }) {
     );
   return (
     <>
-      <aside
-        className="mx-auto max-w-xl px-5 pt-5 text-sm"
-        aria-label="Estado de conexión"
-      >
-        <p role="status">{status}</p>
-        {hub.client.queue.length > 0 && (
-          <button
-            type="button"
-            className="game-button mt-2"
-            onClick={() => {
-              void hub.retry().catch(() => {});
-            }}
-          >
-            Reintentar envíos a la central
-          </button>
-        )}
-      </aside>
+      {!['attract', 'leaderboard', 'admin'].includes(screen) && (
+        <aside
+          className="mx-auto max-w-xl px-5 pt-5 text-sm"
+          aria-label="Estado de conexión"
+        >
+          <p role="status">{status}</p>
+          {hub.client.queue.length > 0 && (
+            <button
+              type="button"
+              className="game-button mt-2"
+              onClick={() => {
+                void hub.retry().catch(() => {});
+              }}
+            >
+              Reintentar envíos a la central
+            </button>
+          )}
+        </aside>
+      )}
       {error && (
         <p role="alert" className="mx-auto max-w-xl px-5 pt-4 text-danger">
           {error}

@@ -3,7 +3,7 @@ import { asset } from '../../brand/brand';
 import { useBrand } from '../../brand/BrandProvider';
 import { t } from '../../brand/t';
 
-export function AttractMedia() {
+export function AttractMedia({ active = true }: { active?: boolean }) {
   const brand = useBrand();
   const [videoFailed, setVideoFailed] = useState(false);
   const [failedImages, setFailedImages] = useState<string[]>([]);
@@ -24,25 +24,30 @@ export function AttractMedia() {
   useEffect(() => {
     if (!showingVideo) return;
     const element = video.current;
-    let active = true;
+    let mounted = true;
     if (element) {
       element.muted = true;
+      if (!active) {
+        element.pause();
+        return;
+      }
       void element.play()?.catch(() => {
-        if (active) setVideoFailed(true);
+        if (mounted) setVideoFailed(true);
       });
     }
     return () => {
-      active = false;
+      mounted = false;
+      element?.pause();
     };
-  }, [showingVideo]);
+  }, [showingVideo, active]);
   useEffect(() => {
-    if (showingVideo || images.length < 2) return;
+    if (!active || showingVideo || images.length < 2) return;
     const id = window.setInterval(
       () => setIndex((index) => (index + 1) % images.length),
       brand.attract.slideIntervalMs,
     );
     return () => window.clearInterval(id);
-  }, [showingVideo, images.length, brand.attract.slideIntervalMs]);
+  }, [active, showingVideo, images.length, brand.attract.slideIntervalMs]);
   if (showingVideo)
     return (
       <video
@@ -52,7 +57,7 @@ export function AttractMedia() {
         muted
         playsInline
         loop
-        autoPlay
+        autoPlay={active}
         preload="auto"
         aria-label={t('attract.mediaAlt')}
         onError={() => setVideoFailed(true)}

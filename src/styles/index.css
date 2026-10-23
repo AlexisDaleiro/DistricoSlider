@@ -98,6 +98,113 @@ textarea {
 .puzzle-tile:disabled {
   cursor: default;
 }
+.attract-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.attract-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.attract-backdrop img,
+.attract-backdrop video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.attract-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 85% 40%,
+    color-mix(in srgb, var(--brand-secondary) 18%, transparent),
+    transparent 65%
+  );
+}
+.attract-layout {
+  @apply mx-auto grid max-w-6xl items-center gap-14 px-7 py-10 sm:px-10 lg:grid-cols-2 lg:gap-20;
+  min-height: calc(100dvh - 6.5rem);
+}
+.attract-headline {
+  @apply mt-5 font-heading text-5xl leading-[1.02] font-bold tracking-tight sm:text-6xl lg:text-7xl;
+}
+.attract-button {
+  min-height: 64px;
+  font-size: 1.125rem;
+}
+.attract-start {
+  animation: attract-invite var(--attract-cycle) ease-in-out infinite;
+}
+.attract-screen[data-paused='true'] .attract-start {
+  animation-play-state: paused;
+}
+.attract-figure {
+  width: min(100%, calc(100dvh - 16rem), 34rem);
+  justify-self: center;
+  padding: 1.25rem;
+}
+.attract-puzzle {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--brand-radius);
+}
+.attract-puzzle-tile {
+  position: absolute;
+  border: 2px solid var(--brand-surface);
+  border-radius: 8px;
+  will-change: transform, opacity;
+}
+.attract-puzzle-complete,
+.attract-shine-clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--brand-radius);
+  pointer-events: none;
+}
+.attract-puzzle-complete {
+  opacity: 1;
+}
+.attract-shine-clip {
+  overflow: hidden;
+}
+.attract-shine {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 25%,
+    var(--brand-surface) 50%,
+    transparent 75%
+  );
+  will-change: transform, opacity;
+}
+.attract-puzzle[data-motion='static'] .attract-puzzle-tile {
+  opacity: 0;
+  will-change: auto;
+}
+@keyframes attract-invite {
+  0%,
+  70%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1.025);
+    opacity: 0.94;
+  }
+}
 @keyframes puzzle-shake-a {
   25%,
   75% {
@@ -117,6 +224,9 @@ textarea {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .attract-start {
+    animation: none;
+  }
   .puzzle-stage {
     animation: none !important;
   }

@@ -366,3 +366,18 @@ Es un campo de `game`. Omitir `game.sounds` también significa apagado. Para act
 - Creados: `src/qa/config.ts`, `QaPanel.tsx`, `soak.ts`, `resources.ts` y sus tres archivos de tests; `src/brand/contrast.ts`, `src/brand/__tests__/polish.test.ts`; `src/features/game/useGameSounds.ts`, `src/features/game/__tests__/sounds.test.tsx`; `scripts/generate-sounds.ts`, `scripts/check-web-build.ts` y su test; los seis WAV en `brands/{_template,demo,districo}/assets/sounds/`.
 - Modificados: `src/brand/{brand,schema,defaultTexts}.ts`, `src/data/db.ts`, `src/main.tsx`, `src/app/App.tsx`, `src/features/game/{GameScreen,CountdownScreen}.tsx`, `src/features/game/ui/PuzzleBoard.tsx`, `src/features/lead-form/fields/InputField.tsx`, `src/styles/index.css`; `scripts/{validate-brand,validate-brand.test,generate-placeholders,build-brand}.ts`, `vite.config.ts`, `package.json`; los tres configs de marca, `README.md` y `DECISIONS.md`. Los recursos Android pueden regenerarse por marca al verificar APK.
 - No se incorporan nuevas dependencias, sincronización, CRM, MDM, idiomas ni otras funciones de la sección 13.
+
+## Probar la portada del stand
+
+```powershell
+$env:VITE_BRAND = 'districo'
+npm run dev
+```
+
+- Portada: observar durante al menos 10 segundos el ciclo de fichas flotantes → encaje → destello → dispersión. Solo usa fotos y medios locales. `attract.animationCycleMs` cambia el ciclo; `attract.animation="none"` o la preferencia del sistema de reducir movimiento muestran el puzzle armado estático. Cambiar de pestaña pausa el loop; salir de la portada lo desmonta.
+- **Empezar juego**: abre un formulario limpio. El registro confirmado de GameHub sigue siendo obligatorio antes de instrucciones y countdown. Cancelar o cambiar de participante vuelve a la portada.
+- **Ver ranking**: abre el ranking del día sin completar el formulario. **Volver** regresa a la portada. Dejar el ranking sin interacción durante 20 s también regresa, con aviso en los últimos 10 s.
+- Inactividad: escribir un borrador en el formulario y dejarlo quieto durante 60 s; al volver a empezar, nombre, celular y consentimiento deben estar vacíos. La portada puede quedarse indefinidamente sin avisos ni timeout. Los plazos se configuran en `kiosk.inactivityMs` y `kiosk.warningMs`.
+- Admin: tocar cinco veces la esquina superior derecha dentro de 3 s para abrir el PIN. La esquina y la cuenta salen de `kiosk.adminHotspot`, `adminTapCount` y `adminTapWindowMs`. En una instalación sin PIN cambiado el valor inicial sigue siendo `0000`; el acceso conserva su timeout y bloqueo existentes.
+
+Para un recorrido local rápido y sin envíos a la central, usar desarrollo con `?qa=1`: la base es aislada y el modo de prueba se indica en pantalla. FORM vuelve a la portada tras 6 s y LEADERBOARD tras 2 s. Los tiempos normales y la animación configurada no se modifican en producción. Más detalles en [DECISIONS.md](DECISIONS.md), sección «Portada de stand y retorno del kiosco».

@@ -26,7 +26,7 @@ No usar como endpoint el enlace del editor, `/dev`, la planilla ni `URL_EXEC`. N
 
 ## Flujo
 
-1. Nombre y celular obligatorios, aviso sobre registro de datos y resultados, y consentimiento. Sin empresa, email ni suscripciones de marketing. Uruguay por defecto; admite `+` o `00` con otro prefijo. La validación de formato no verifica el celular por SMS.
+1. Portada con imagen local animada, Empezar juego y Ver ranking. Empezar juego abre el formulario: nombre y celular obligatorios, aviso sobre registro de datos y resultados, y consentimiento. Sin empresa, email ni suscripciones de marketing. Uruguay por defecto; admite `+` o `00` con otro prefijo. La validación de formato no verifica el celular por SMS.
 2. El SDK crea `registration`. En producción se muestran las instrucciones únicamente después de recibir `ok:true` con el mismo `eventId`. Una respuesta opaca, un rechazo o una desconexión no habilitan jugar. Si falta configuración, el botón queda bloqueado y se muestran los campos pendientes.
 3. Cada participación tiene un `sessionId`. Cada ronda tiene un `runId` nuevo, compartido por su inicio y su final. El juego envía `game_started`, seguido de `game_completed` (resuelto o tiempo agotado) o `game_abandoned` (salida, cambio de participante o inactividad).
 4. **Jugar otra ronda** conserva la participación y crea una partida nueva. **Cambiar participante** limpia nombre, celular, consentimiento, IDs y tablero. La central identifica personas por teléfono normalizado; localmente también se reutiliza el participante por evento y teléfono.

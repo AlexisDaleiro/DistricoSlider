@@ -54,6 +54,11 @@
     "backgroundImage": null
   },
   "attract": {
+    "startButton": "Empezar juego",
+    "rankingButton": "Ver ranking",
+    "backButton": "Volver",
+    "animation": "puzzle-assemble",
+    "animationCycleMs": 9000,
     "mode": "slideshow",
     "media": ["assets/attract/cover.webp"],
     "slideIntervalMs": 6000,

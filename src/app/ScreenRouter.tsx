@@ -149,6 +149,8 @@ function LocalScreenRouter({ visit }: { visit: number }) {
     case 'attract':
       return (
         <AttractScreen
+          prepared={prepared}
+          image={image}
           onStart={() => void start()}
           gridSize={gridSize}
           onAdmin={() => flowStore.getState().go('admin')}

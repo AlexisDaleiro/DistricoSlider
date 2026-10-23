@@ -108,7 +108,7 @@ it('500 flujos reales: lead antes de GAME, resultado/ranking, formulario limpio,
   await production.settings.put({ key: 'sentinel', value: 'conservar' });
   expect(db.name).toBe('kiosk-puzzle-qa');
   render(<App />);
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   // Este harness recorre el event loop del navegador, no simula componentes.
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
   const progress: number[] = [];
@@ -149,7 +149,7 @@ it('500 flujos reales: lead antes de GAME, resultado/ranking, formulario limpio,
 }, 400000);
 it('cancelar restaura instrumentos y vuelve a ATTRACT conservando las capturas ya guardadas', async () => {
   render(<App />);
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
   const original = window.setTimeout;
   const work = runSoak({ signal: controller.signal, pollMs: 1, cycles: 5 });

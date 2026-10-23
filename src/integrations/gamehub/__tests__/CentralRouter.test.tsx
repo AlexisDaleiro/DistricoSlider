@@ -94,6 +94,12 @@ function fill(name = 'Ana Pérez', phone = '099123456') {
   });
   fireEvent.click(screen.getByLabelText(brand.form.consent.text));
 }
+async function openForm() {
+  fireEvent.click(
+    await screen.findByRole('button', { name: brand.attract.startButton }),
+  );
+  await screen.findByLabelText('Celular');
+}
 async function submit() {
   await act(async () => {
     fireEvent.submit(document.querySelector('form')!);
@@ -124,6 +130,7 @@ it('bloquea el juego cuando faltan los seis valores de conexión', async () => {
     gameName: '',
   });
   render(<App />);
+  await openForm();
   const button = await screen.findByRole('button', {
     name: 'Conexión pendiente',
   });
@@ -134,7 +141,7 @@ it('bloquea el juego cuando faltan los seis valores de conexión', async () => {
 });
 it('pide solo nombre/celular antes de instrucciones y exige registro confirmado para avanzar', async () => {
   render(<App />);
-  await screen.findByLabelText('Celular');
+  await openForm();
   expect(screen.queryByLabelText('Email')).toBeNull();
   expect(screen.queryByLabelText('Empresa')).toBeNull();
   expect(
@@ -159,7 +166,7 @@ it('pide solo nombre/celular antes de instrucciones y exige registro confirmado 
 });
 it('varias rondas conservan participante, puntaje y sesión; cambiarlo limpia los datos', async () => {
   render(<App />);
-  await screen.findByLabelText('Celular');
+  await openForm();
   fill();
   await submit();
   await enterGame();
@@ -189,7 +196,7 @@ it('varias rondas conservan participante, puntaje y sesión; cambiarlo limpia lo
   expect(events[3].runId).toBe(events[4].runId);
   expect(events[1].runId).not.toBe(events[3].runId);
   fireEvent.click(screen.getByRole('button', { name: 'Cambiar participante' }));
-  await screen.findByLabelText('Celular');
+  await openForm();
   expect((screen.getByLabelText('Celular') as HTMLInputElement).value).toBe('');
   expect(
     (screen.getByLabelText('Nombre y apellido') as HTMLInputElement).value,
@@ -209,16 +216,61 @@ it('el registro inicial también se limpia por inactividad', async () => {
   let now = 0;
   vi.spyOn(performance, 'now').mockImplementation(() => now);
   render(<App />);
-  await screen.findByLabelText('Celular');
+  await openForm();
   fill();
   now += brand.kiosk.inactivityMs.form + 1;
   act(() => {
     checkActivityNow();
   });
+  await screen.findByRole('button', { name: brand.attract.startButton });
+  await openForm();
   await waitFor(() =>
     expect((screen.getByLabelText('Celular') as HTMLInputElement).value).toBe(
       '',
     ),
   );
+  expect(events).toHaveLength(0);
+});
+
+it('portada sin timeout, ranking directo con Volver y timeout del ranking a portada', async () => {
+  let now = 0;
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
+  render(<App />);
+  await screen.findByRole('button', { name: brand.attract.startButton });
+  expect(screen.queryByLabelText('Celular')).toBeNull();
+  now += 10 * 60 * 1000;
+  act(() => checkActivityNow());
+  expect(flowStore.getState().visit).toBe(0);
+  expect(screen.queryByRole('dialog')).toBeNull();
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.attract.rankingButton }),
+  );
+  await screen.findByRole('heading', {
+    name: brand.texts['leaderboard.title'],
+  });
+  expect(events).toHaveLength(0);
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.attract.backButton }),
+  );
+  await screen.findByRole('button', { name: brand.attract.startButton });
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.attract.rankingButton }),
+  );
+  await screen.findByRole('heading', {
+    name: brand.texts['leaderboard.title'],
+  });
+  now += brand.kiosk.inactivityMs.leaderboard + 1;
+  act(() => checkActivityNow());
+  await screen.findByRole('button', { name: brand.attract.startButton });
+  expect(flowStore.getState().screen).toBe('attract');
+});
+
+it('el hotspot de cinco toques abre el admin desde la portada', async () => {
+  render(<App />);
+  await screen.findByRole('button', { name: brand.attract.startButton });
+  for (let tap = 0; tap < 5; tap++)
+    fireEvent.click(screen.getByTestId('admin-hotspot'));
+  await waitFor(() => expect(flowStore.getState().screen).toBe('admin'));
+  expect(screen.queryByLabelText('Celular')).toBeNull();
   expect(events).toHaveLength(0);
 });

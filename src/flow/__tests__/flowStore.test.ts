@@ -16,9 +16,9 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
-it('conserva la tabla exacta del spec y verifica las 49 combinaciones en dev', () => {
+it('la portada abre formulario o ranking y todos los flujos vuelven a ella; verifica las 49 combinaciones', () => {
   expect(TRANSITIONS).toEqual({
-    attract: ['form', 'admin', 'leaderboard'],
+    attract: ['form', 'leaderboard', 'admin'],
     form: ['countdown', 'attract'],
     countdown: ['game', 'attract'],
     game: ['result', 'attract'],

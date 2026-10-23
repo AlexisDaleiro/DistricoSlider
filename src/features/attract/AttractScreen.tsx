@@ -1,6 +1,9 @@
+import type { CSSProperties } from 'react';
 import { useBrand } from '../../brand/BrandProvider';
 import { t } from '../../brand/t';
 import { AttractMedia } from './AttractMedia';
+import { AttractPuzzle, type AttractImage } from './AttractPuzzle';
+import { useAttractPreferences } from './useAttractPreferences';
 import { BrandHeader } from '../../shared/ui/BrandHeader';
 import { AdminHotspot } from '../admin/AdminHotspot';
 
@@ -10,57 +13,76 @@ export function AttractScreen({
   startError,
   onAdmin,
   gridSize,
+  image,
+  prepared,
 }: {
   onStart: () => void;
   onLeaderboard: () => void;
   startError: boolean;
   onAdmin?: () => void;
   gridSize?: 3 | 4;
+  image?: AttractImage;
+  prepared?: { url: string | null };
 }) {
   const brand = useBrand();
+  const { visible, reducedMotion } = useAttractPreferences();
   return (
-    <div className="min-h-dvh cursor-pointer" onClick={onStart}>
+    <div
+      className="attract-screen min-h-dvh"
+      data-paused={!visible}
+      style={
+        {
+          '--attract-cycle': `${brand.attract.animationCycleMs}ms`,
+        } as CSSProperties
+      }
+    >
+      {brand.attract.media.length > 0 && (
+        <div className="attract-backdrop" aria-hidden="true">
+          <AttractMedia active={visible && !reducedMotion} />
+        </div>
+      )}
       {onAdmin && <AdminHotspot onUnlock={onAdmin} />}
       <BrandHeader />
-      <main className="game-layout">
-        <section className="order-2 max-w-lg lg:order-1">
+      <main className="attract-layout">
+        <section className="attract-copy">
           <p className="game-eyebrow">{t('game.eyebrow')}</p>
-          <h1 className="mt-5 font-heading text-5xl leading-[1.05] font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            {brand.attract.headline}
-          </h1>
+          <h1 className="attract-headline">{brand.attract.headline}</h1>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
             {t('showcase.description')}
           </p>
-          <p className="mt-4 text-sm font-medium text-primary">
-            {t('game.firstMove')}
-          </p>
           {startError && (
-            <p role="alert" className="mt-6 text-danger">
+            <p role="alert" className="mt-5 text-danger">
               {t('game.loadError')}
             </p>
           )}
-          <button
-            className="game-button mt-8 bg-primary text-on-primary"
-            type="button"
-          >
-            {startError ? t('game.retry') : brand.attract.cta}
-          </button>
-          <button
-            className="game-button mt-3 text-primary"
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onLeaderboard();
-            }}
-          >
-            {t('result.ranking')}
-          </button>
+          <div className="mt-8 grid gap-4">
+            <button
+              className="game-button attract-button attract-start bg-primary text-on-primary"
+              type="button"
+              onClick={onStart}
+            >
+              {brand.attract.startButton}
+            </button>
+            <button
+              className="game-button attract-button bg-secondary text-on-secondary"
+              type="button"
+              onClick={onLeaderboard}
+            >
+              {brand.attract.rankingButton}
+            </button>
+          </div>
         </section>
-        <figure className="order-1 mx-auto w-full rounded-brand bg-surface p-3 lg:order-2 lg:rotate-2">
-          <AttractMedia />
-          <figcaption className="flex items-center justify-between gap-3 px-2 py-4 text-sm">
+        <figure className="attract-figure">
+          <AttractPuzzle
+            prepared={prepared}
+            image={image ?? brand.game.images[0]}
+            size={gridSize ?? brand.game.gridSize}
+            visible={visible}
+            reducedMotion={reducedMotion}
+          />
+          <figcaption className="mt-8 flex items-center justify-between gap-3 text-sm text-muted">
             <span>{t('showcase.imageCaption')}</span>
-            <span className="rounded-full bg-secondary px-3 py-1 font-bold text-on-secondary">
+            <span className="rounded-full bg-surface px-4 py-2 font-bold text-primary">
               {t('game.grid', { size: gridSize ?? brand.game.gridSize })}
             </span>
           </figcaption>

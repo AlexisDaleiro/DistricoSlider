@@ -110,10 +110,15 @@ export const brandSchema = z.strictObject({
   }),
   attract: z.strictObject({
     mode: z.enum(['video', 'slideshow']),
-    media: z.array(assetPath).min(1),
+    media: z.array(assetPath).default([]),
     slideIntervalMs: positiveInt,
     headline: text,
     cta: text,
+    startButton: text.default('Empezar juego'),
+    rankingButton: text.default('Ver ranking'),
+    backButton: text.default('Volver'),
+    animation: z.enum(['puzzle-assemble', 'none']).default('puzzle-assemble'),
+    animationCycleMs: positiveInt.default(9000),
     showLeaderboardEveryMs: z.number().int().nonnegative().optional(),
   }),
   form: z.strictObject({

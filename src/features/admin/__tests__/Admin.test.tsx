@@ -110,7 +110,7 @@ it('CSV habilita borrado, pero exige reingresar PIN y sostener antes de eliminar
 });
 async function openAdmin() {
   render(<App />);
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   const hotspot = screen.getByTestId('admin-hotspot');
   for (let i = 0; i < 4; i++) fireEvent.click(hotspot);
   expect(screen.queryByRole('dialog')).toBeNull();
@@ -158,7 +158,7 @@ it('hotspot abre PIN; PIN correcto abre métricas, banner por defecto y salida e
   fireEvent.click(
     screen.getByRole('button', { name: brand.texts['admin.exit'] }),
   );
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   expect(
     screen.queryByRole('heading', { name: brand.texts['admin.title'] }),
   ).toBeNull();
@@ -196,7 +196,7 @@ it('tres intentos incorrectos bloquean también al volver a abrir el acceso', as
   fireEvent.click(
     screen.getByRole('button', { name: brand.texts['admin.cancel'] }),
   );
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   for (let i = 0; i < 5; i++)
     fireEvent.click(screen.getByTestId('admin-hotspot'));
   await screen.findByRole('dialog');
@@ -249,10 +249,12 @@ it('grilla se guarda y admin por inactividad cierra también sus modales sin per
   expect(screen.getByRole('dialog')).toBeTruthy();
   now = brand.kiosk.inactivityMs.admin;
   act(() => checkActivityNow());
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(await db.leads.count()).toBe(1);
-  fireEvent.click(screen.getByRole('button', { name: brand.attract.cta }));
+  fireEvent.click(
+    screen.getByRole('button', { name: brand.attract.startButton }),
+  );
   await screen.findByLabelText('Email');
   expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe('');
 });
@@ -267,7 +269,7 @@ it('Atrás nativo cierra primero el modal, después admin, y vuelve a exigir PIN
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(flowStore.getState().screen).toBe('admin');
   act(() => handleNativeBack());
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
   for (let i = 0; i < 5; i++)
     fireEvent.click(screen.getByTestId('admin-hotspot'));
   await screen.findByRole('dialog');
@@ -275,5 +277,5 @@ it('Atrás nativo cierra primero el modal, después admin, y vuelve a exigir PIN
     screen.queryByRole('button', { name: brand.texts['admin.exportCsv'] }),
   ).toBeNull();
   act(() => handleNativeBack());
-  await screen.findByRole('button', { name: brand.attract.cta });
+  await screen.findByRole('button', { name: brand.attract.startButton });
 });
