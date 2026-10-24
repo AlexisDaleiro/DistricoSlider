@@ -52,5 +52,5 @@ if (
 )
   for (const id of process.argv.slice(2).length
     ? process.argv.slice(2)
-    : ['demo', '_template', 'districo'])
+    : ['demo', '_template', 'biofresh', 'granplus'])
     await generateSounds(id);

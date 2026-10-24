@@ -28,7 +28,9 @@ let initialization: Promise<void> | null = null;
 export function initializeData(): Promise<void> {
   initialization ??= initializeDatabase(db)
     .then(async () => {
-      await createPinRepo(brand.brand.id).ensure(__INITIAL_ADMIN_PIN__);
+      await createPinRepo(brand.brand.androidAppId).ensure(
+        __INITIAL_ADMIN_PIN__,
+      );
     })
     .catch((cause) => {
       initialization = null;

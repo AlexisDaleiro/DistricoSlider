@@ -5,3 +5,4 @@ declare const __INITIAL_ADMIN_PIN__: {
   isDefault: boolean;
 };
 declare const __APP_VERSION__: string;
+declare const __BRANDS__: string[];

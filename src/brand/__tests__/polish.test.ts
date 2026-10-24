@@ -6,7 +6,7 @@ import { reviewContrast } from '../contrast';
 import { projectRoot, validateBrand } from '../../../scripts/validate-brand';
 import { soundWav } from '../../../scripts/generate-sounds';
 import raw from '../../../brands/demo/theme.config.json';
-it.each(['demo', '_template', 'districo'])(
+it.each(['demo', '_template', 'biofresh', 'granplus'])(
   '%s cumple 12 combinaciones de texto y mantiene sonidos apagados',
   async (id) => {
     const config = await validateBrand(id);

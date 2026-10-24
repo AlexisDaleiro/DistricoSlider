@@ -1,10 +1,10 @@
-# Districo y la central de juegos
+# BiofreshSlider y la central de juegos
 
 Puzzle usa el SDK común descargado del endpoint publicado `?view=sdk`. Está incluido sin cambios en `src/integrations/gamehub/vendor/shared-sdk.js`; Vite lo incorpora al juego. No se crea ni publica otro backend. `demo` y `_template` mantienen su flujo local anterior.
 
 ## Configuración aplicada
 
-El bloque `gameHub` de `brands/districo/theme.config.json` contiene la configuración proporcionada para la fila propia de Puzzle en **Juegos**:
+El bloque `gameHub` de `brands/biofresh/theme.config.json` contiene la configuración proporcionada para la fila propia de Puzzle en **Juegos**:
 
 | Campo                | Valor configurado                                            |
 | -------------------- | ------------------------------------------------------------ |
@@ -20,7 +20,7 @@ El bloque `gameHub` de `brands/districo/theme.config.json` contiene la configura
 
 No faltan valores de conexión para Puzzle. No se usaron la clave ni el ID de Fresh Slice. La versión enviada es `gameVersion:1.0.0`; `package.json` es solo el respaldo para configuraciones que omitan la versión del protocolo. Los nombres comerciales definitivos de las filas los decide el catálogo del servidor.
 
-La identidad de los eventos enviados es Biofresh / Puzzle. La presentación visual existente de Districo y su motor se conservan.
+La identidad de los eventos enviados es Biofresh / Puzzle. GranPlus todavía no tiene fila propia en la central: sin bloque `gameHub`, guarda registros solo en la tablet hasta recibir sus credenciales.
 
 No usar como endpoint el enlace del editor, `/dev`, la planilla ni `URL_EXEC`. No hace falta compartir públicamente la planilla. El navegador solo usa el puente y el método público `recibirEvento`; no llama a las funciones administrativas terminadas en `_`. La clave del cliente es pública y no acredita la identidad ni la autenticidad del puntaje.
 
@@ -46,7 +46,7 @@ La cola original del SDK vive en `sessionStorage`, con máximo de 80 eventos y d
 Para una prueba local explícita, dejar `endpoint` y `gameKey` vacíos y poner `allowPreview:true`. Ejecutar:
 
 ```powershell
-$env:VITE_BRAND = 'districo'
+$env:VITE_BRAND = 'biofresh,granplus'
 npm run dev
 ```
 
@@ -55,11 +55,11 @@ Se muestra **Modo de prueba: los datos no se envían ni se guardan en la central
 Para compilar con la conexión publicada:
 
 ```powershell
-$env:VITE_BRAND = 'districo'
+$env:VITE_BRAND = 'biofresh,granplus'
 npm run build
 ```
 
-El resultado web queda en `dist/`. Para regenerar el APK se utiliza el flujo Android existente `npm run brand:build -- districo`. La prueba en un navegador no sustituye una comprobación del puente dentro del WebView del dispositivo final.
+El resultado web queda en `dist/`. Para regenerar el APK se utiliza el flujo Android existente `npm run brand:build -- biofresh,granplus`. La prueba en un navegador no sustituye una comprobación del puente dentro del WebView del dispositivo final.
 
 ## Verificación
 

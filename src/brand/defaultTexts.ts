@@ -70,6 +70,7 @@ export const defaultTexts = {
   'admin.pinChanged': 'PIN actualizado.',
   'admin.audit': 'Log de auditoría',
   'admin.grid': 'Tamaño de las próximas partidas',
+  'admin.brand': 'Marca del juego',
   'admin.deleteRequirement':
     'Para borrar los datos del evento se requiere una exportación de todos los leads en los últimos {minutes} minutos, reingresar el PIN y mantener presionado el botón.',
   'admin.deleteEvent': 'Borrar todos los datos del evento',

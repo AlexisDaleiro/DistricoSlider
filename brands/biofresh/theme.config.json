@@ -13,12 +13,12 @@
     "allowPreview": false
   },
   "brand": {
-    "id": "districo",
-    "name": "DISTRICO",
-    "appName": "Districo Puzzle",
+    "id": "biofresh",
+    "name": "Biofresh",
+    "appName": "BiofreshSlider",
     "androidAppId": "uy.kioskpuzzle.districo",
-    "logo": "assets/logo.jpg",
-    "logoOnPrimary": "assets/logo.jpg"
+    "logo": "assets/logo.svg",
+    "logoOnPrimary": "assets/logo-on-primary.svg"
   },
   "event": {
     "id": "districo-demo",
@@ -27,27 +27,27 @@
   },
   "theme": {
     "colors": {
-      "primary": "#204F5F",
+      "primary": "#1F1F1F",
       "onPrimary": "#FFFFFF",
-      "secondary": "#B1CA00",
-      "onSecondary": "#204F5F",
-      "background": "#F3F8F8",
+      "secondary": "#F9A8D4",
+      "onSecondary": "#1F1F1F",
+      "background": "#FAE7ED",
       "surface": "#FFFFFF",
-      "text": "#204F5F",
-      "textMuted": "#526B73",
+      "text": "#1F1F1F",
+      "textMuted": "#5C4A52",
       "success": "#22704D",
       "danger": "#AE3548",
-      "tileGap": "#DDE7E8"
+      "tileGap": "#F3D3DE"
     },
     "fonts": {
       "heading": {
-        "family": "Space Grotesk",
-        "file": "assets/fonts/space-grotesk-latin-700-normal.woff2",
+        "family": "Playfair Display",
+        "file": "assets/fonts/playfair-display-latin-700-normal.woff2",
         "weight": 700
       },
       "body": {
-        "family": "DM Sans",
-        "file": "assets/fonts/dm-sans-latin-400-normal.woff2",
+        "family": "Nunito Sans",
+        "file": "assets/fonts/nunito-sans-latin-400-normal.woff2",
         "weight": 400
       }
     },
@@ -101,20 +101,6 @@
     "images": [
       {
         "src": "assets/puzzle/biofresh.jpg",
-        "focalPoint": {
-          "x": 0.5,
-          "y": 0.5
-        }
-      },
-      {
-        "src": "assets/puzzle/granplus-carne.jpg",
-        "focalPoint": {
-          "x": 0.5,
-          "y": 0.5
-        }
-      },
-      {
-        "src": "assets/puzzle/granplus-salmon.jpg",
         "focalPoint": {
           "x": 0.5,
           "y": 0.5
@@ -173,7 +159,7 @@
     "splashMs": 1200
   },
   "export": {
-    "filePrefix": "leads_districo",
+    "filePrefix": "leads_biofresh",
     "csvSeparator": ";",
     "includeXlsx": true
   },
@@ -185,6 +171,6 @@
     "showcase.imageCaption": "Cada pieza tiene su lugar.",
     "showcase.grid": "{size} × {size}",
     "showcase.scope": "Vista de marca · Fases 1 y 2",
-    "game.eyebrow": "El desafío Districo"
+    "game.eyebrow": "El desafío Biofresh"
   }
 }

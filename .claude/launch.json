@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "slider",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-Command",
+        "$env:VITE_BRAND='biofresh,granplus'; npx vite --host 127.0.0.1 --port 5180 --strictPort"
+      ],
+      "port": 5180
+    }
+  ]
+}

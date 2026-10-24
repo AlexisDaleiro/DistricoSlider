@@ -1,11 +1,11 @@
 import { expect, it, vi } from 'vitest';
-import raw from '../../../../brands/districo/theme.config.json';
+import raw from '../../../../brands/biofresh/theme.config.json';
 import { getGameHub } from '../runtime';
 
 vi.mock('../../../brand/brand', async () => {
   const { brandSchema } = await import('../../../brand/schema');
   const { default: config } =
-    await import('../../../../brands/districo/theme.config.json');
+    await import('../../../../brands/biofresh/theme.config.json');
   return { brand: brandSchema.parse(config) };
 });
 

@@ -1,5 +1,9 @@
 # Kiosk Puzzle — Fases 1 a 8
 
+## BiofreshSlider / GranPlusSlider
+
+Un solo APK incluye las marcas `biofresh` y `granplus` (`VITE_BRAND=biofresh,granplus`; la primera es la inicial y da la identidad Android, con nombre de ícono "Slider"). En el panel admin, "Marca del juego" cambia la marca: se guarda en la tablet (`localStorage` `kiosk.brand`) y la app se recarga con colores, logo, tipografías, nombre y bolsas de esa marca. Registros, ranking y exportación quedan separados por `event.id` de cada marca; Biofresh conserva el evento `districo-demo` anterior. El PIN admin es uno solo para las dos marcas. GranPlus no tiene `gameHub` hasta recibir sus credenciales de la central.
+
 Districo incorpora el registro obligatorio de nombre y celular y el protocolo de la central Google Sheets + Apps Script, con la configuración publicada de Biofresh / Puzzle (`biofresh-puzzle`). Ver [GAMEHUB.md](GAMEHUB.md) para probar y compilar. Su producción requiere registro confirmado por la central; el modo offline descrito en las fases anteriores corresponde al flujo local de demo y a las pruebas explícitas.
 
 Scaffolding white-label offline, motor puro y UI jugable de puzzle deslizable 3×3 / 4×4, según [el spec recibido](brief%20base/SPEC_KIOSK_PUZZLE.md). Incluye formulario configurable, persistencia IndexedDB y flujo ATTRACT → FORM → COUNTDOWN → GAME → RESULT → LEADERBOARD. El lead y su sesión se guardan juntos antes del countdown; el resultado se guarda antes de mostrar RESULT. Incluye kiosco con inactividad, admin con PIN, exportación offline CSV/XLSX y APK Android por marca.
@@ -47,7 +51,7 @@ La suite incluye las pruebas de las fases anteriores y 10.000 mezclas por tamañ
 ## Districo y aceptación manual de Fase 3
 
 ```powershell
-$env:VITE_BRAND = 'districo'
+$env:VITE_BRAND = 'biofresh,granplus'
 npm run dev
 ```
 
@@ -233,7 +237,7 @@ $env:ANDROID_HOME = 'C:\ruta\Android\Sdk'
 # El PIN inicial sigue admitiendo ADMIN_PIN; no pisa uno ya guardado.
 npm ci
 npm run brand:build -- demo
-npm run brand:build -- districo
+npm run brand:build -- biofresh,granplus
 ```
 
 El comando valida config/assets e íconos, comprueba TypeScript, construye Vite, aplica la marca a Android, genera recursos con `@capacitor/assets`, ejecuta `cap sync android` en producción y `assembleRelease`. Deja el APK en `artifacts/android/<marca>-development-release.apk`. Sin SDK se puede preparar web/Android con `npm run brand:build -- demo --sync-only`; ese modo **no genera APK**. `npm run android:patch -- demo` actualiza únicamente identidad y recursos nativos. No ejecutar builds de dos marcas al mismo tiempo: comparten `dist/` y `android/`.
@@ -370,7 +374,7 @@ Es un campo de `game`. Omitir `game.sounds` también significa apagado. Para act
 ## Probar la portada del stand
 
 ```powershell
-$env:VITE_BRAND = 'districo'
+$env:VITE_BRAND = 'biofresh,granplus'
 npm run dev
 ```
 

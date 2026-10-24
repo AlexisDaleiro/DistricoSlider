@@ -21,7 +21,7 @@ import { checkActivityNow } from '../../../kiosk/activityTracker';
 vi.mock('../../../brand/brand', async () => {
   const { brandSchema } = await import('../../../brand/schema');
   const { default: raw } =
-    await import('../../../../brands/districo/theme.config.json');
+    await import('../../../../brands/biofresh/theme.config.json');
   return { brand: brandSchema.parse(raw), asset: (src: string) => src };
 });
 vi.mock('../runtime', () => ({ getGameHub: () => hub }));

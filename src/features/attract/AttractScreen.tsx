@@ -47,7 +47,7 @@ export function AttractScreen({
         <section className="attract-copy">
           <p className="game-eyebrow">{t('game.eyebrow')}</p>
           <h1 className="attract-headline">{brand.attract.headline}</h1>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
+          <p className="attract-description text-muted">
             {t('showcase.description')}
           </p>
           {startError && (
@@ -55,23 +55,23 @@ export function AttractScreen({
               {t('game.loadError')}
             </p>
           )}
-          <div className="mt-8 grid gap-4">
-            <button
-              className="game-button attract-button attract-start bg-primary text-on-primary"
-              type="button"
-              onClick={onStart}
-            >
-              {brand.attract.startButton}
-            </button>
-            <button
-              className="game-button attract-button bg-secondary text-on-secondary"
-              type="button"
-              onClick={onLeaderboard}
-            >
-              {brand.attract.rankingButton}
-            </button>
-          </div>
         </section>
+        <div className="attract-actions">
+          <button
+            className="game-button attract-button attract-start bg-primary text-on-primary"
+            type="button"
+            onClick={onStart}
+          >
+            {brand.attract.startButton}
+          </button>
+          <button
+            className="game-button attract-button bg-secondary text-on-secondary"
+            type="button"
+            onClick={onLeaderboard}
+          >
+            {brand.attract.rankingButton}
+          </button>
+        </div>
         <figure className="attract-figure">
           <AttractPuzzle
             prepared={prepared}
@@ -80,7 +80,7 @@ export function AttractScreen({
             visible={visible}
             reducedMotion={reducedMotion}
           />
-          <figcaption className="mt-8 flex items-center justify-between gap-3 text-sm text-muted">
+          <figcaption className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
             <span>{t('showcase.imageCaption')}</span>
             <span className="rounded-full bg-surface px-4 py-2 font-bold text-primary">
               {t('game.grid', { size: gridSize ?? brand.game.gridSize })}

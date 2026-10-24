@@ -30,8 +30,8 @@ it('valida todos los assets de demo y template sin advertencias', async () => {
   expect((await validateBrand('_template', projectRoot, warn)).brand.id).toBe(
     '_template',
   );
-  expect((await validateBrand('districo', projectRoot, warn)).brand.id).toBe(
-    'districo',
+  expect((await validateBrand('biofresh', projectRoot, warn)).brand.id).toBe(
+    'biofresh',
   );
   expect(warn).not.toHaveBeenCalled();
 });

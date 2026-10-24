@@ -10,7 +10,13 @@ import { runCommand, runNode } from './run-command.ts';
 import { checkWebBuild } from './check-web-build.ts';
 
 export async function buildBrand(id: string, syncOnly = false) {
-  const brand = await validateBrand(id);
+  const ids = id.split(',');
+  const [first] = await Promise.all(ids.map((each) => validateBrand(each)));
+  // Varias marcas comparten APK: identidad Android de la primera, nombre neutro.
+  const brand =
+    ids.length > 1
+      ? { ...first, brand: { ...first.brand, appName: 'Slider' } }
+      : first;
   await validateAndroidAssets(brand);
   const env: NodeJS.ProcessEnv = {
     ...process.env,
@@ -122,7 +128,7 @@ export async function buildBrand(id: string, syncOnly = false) {
   await mkdir(destination, { recursive: true });
   const file = resolve(
     destination,
-    `${id}-${signing.length ? 'release' : 'development-release'}.apk`,
+    `${ids.join('-')}-${signing.length ? 'release' : 'development-release'}.apk`,
   );
   await copyFile(
     resolve(android, 'app/build/outputs/apk/release/app-release.apk'),

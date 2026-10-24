@@ -13,7 +13,7 @@ import { patchAndroid, validateAndroidAssets } from './patch-android';
 import sharp from 'sharp';
 import { parseBrand, projectRoot } from './validate-brand';
 import demo from '../brands/demo/theme.config.json';
-import districo from '../brands/districo/theme.config.json';
+import biofresh from '../brands/biofresh/theme.config.json';
 
 let root: string;
 beforeEach(async () => {
@@ -48,7 +48,7 @@ afterEach(async () => {
   await rm(root, { recursive: true, force: true });
 });
 it('cambia marca, paquete/ruta, versión, colores y orientación; repetir es idempotente', async () => {
-  const brand = parseBrand(districo);
+  const brand = parseBrand(biofresh);
   brand.kiosk.orientation = 'portrait';
   brand.brand.appName = 'Puzzle & "Marca" O\'Brien';
   await patchAndroid(brand, root);
@@ -101,7 +101,7 @@ it('rechaza paquete malicioso antes de modificar la Activity', async () => {
   );
 });
 it('verifica los PNG de Android de las tres marcas antes del build', async () => {
-  for (const id of ['demo', 'districo', '_template']) {
+  for (const id of ['demo', 'biofresh', 'granplus', '_template']) {
     const raw = JSON.parse(
       await readFile(
         resolve(projectRoot, 'brands', id, 'theme.config.json'),
@@ -127,22 +127,33 @@ it('un icono ausente o con dimensiones incorrectas bloquea Android con error', a
   );
 });
 it('config release es local, sin depuración, y toma identidad/splash de la marca', async () => {
-  vi.stubEnv('VITE_BRAND', 'districo');
+  vi.stubEnv('VITE_BRAND', 'biofresh');
   vi.stubEnv('NODE_ENV', 'production');
   try {
     vi.resetModules();
     const { default: config } = await import('../capacitor.config');
-    expect(config.appId).toBe(districo.brand.androidAppId);
-    expect(config.appName).toBe(districo.brand.appName);
+    expect(config.appId).toBe(biofresh.brand.androidAppId);
+    expect(config.appName).toBe(biofresh.brand.appName);
     expect(config.server).toBeUndefined();
     expect(config.android?.webContentsDebuggingEnabled).toBe(false);
     expect(config.android?.allowMixedContent).toBe(false);
     expect(config.plugins?.SplashScreen?.launchShowDuration).toBe(
-      districo.kiosk.splashMs,
+      biofresh.kiosk.splashMs,
     );
     expect(config.plugins?.SplashScreen?.backgroundColor).toBe(
-      districo.theme.colors.background,
+      biofresh.theme.colors.background,
     );
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+it('varias marcas comparten APK con la identidad de la primera y nombre neutro', async () => {
+  vi.stubEnv('VITE_BRAND', 'biofresh,granplus');
+  try {
+    vi.resetModules();
+    const { default: config } = await import('../capacitor.config');
+    expect(config.appId).toBe(biofresh.brand.androidAppId);
+    expect(config.appName).toBe('Slider');
   } finally {
     vi.unstubAllEnvs();
   }

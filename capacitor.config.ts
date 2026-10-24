@@ -4,16 +4,17 @@ import type { CapacitorConfig } from '@capacitor/cli';
 import type { BrandConfig } from './src/brand/schema';
 
 // brand:build valida el mismo JSON antes de invocar Capacitor.
-const id = process.env.VITE_BRAND ?? 'demo';
-if (!/^(?:[a-z0-9][a-z0-9_-]*|_template)$/.test(id))
+// Varias marcas comparten APK: la primera da la identidad Android.
+const ids = (process.env.VITE_BRAND ?? 'demo').split(',');
+if (!ids.every((id) => /^(?:[a-z0-9][a-z0-9_-]*|_template)$/.test(id)))
   throw new Error('VITE_BRAND inválida.');
 const brand = JSON.parse(
-  readFileSync(resolve('brands', id, 'theme.config.json'), 'utf8'),
+  readFileSync(resolve('brands', ids[0], 'theme.config.json'), 'utf8'),
 ) as BrandConfig;
 
 const config: CapacitorConfig = {
   appId: brand.brand.androidAppId,
-  appName: brand.brand.appName,
+  appName: ids.length > 1 ? 'Slider' : brand.brand.appName,
   webDir: 'dist',
   android: {
     allowMixedContent: false,

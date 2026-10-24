@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useBrand } from '../../brand/BrandProvider';
+import { brandIds, brandNames, selectBrand } from '../../brand/brand';
 import { t } from '../../brand/t';
 import { eventRepo } from '../../data/repos/eventRepo';
 import { settingsRepo } from '../../data/repos/settingsRepo';
@@ -350,6 +351,30 @@ export function AdminDashboard({
               ))}
             </div>
           </fieldset>
+          {brandIds.length > 1 && (
+            <fieldset className="mt-7">
+              <legend className="font-bold">{t('admin.brand')}</legend>
+              <div className="mt-3 flex gap-3">
+                {brandIds.map((id) => (
+                  <button
+                    className={`game-button ${brand.brand.id === id ? 'bg-primary text-on-primary' : 'bg-bg text-primary'}`}
+                    type="button"
+                    disabled={busy || brand.brand.id === id}
+                    key={id}
+                    aria-pressed={brand.brand.id === id}
+                    onClick={() =>
+                      void run(async () => {
+                        await auditRepo.add('brand_changed', id);
+                        selectBrand(id);
+                      })
+                    }
+                  >
+                    {brandNames[id]}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
           <section className="mt-8 border-t border-muted/25 pt-6">
             <p className="text-sm text-muted">
               {t('admin.deleteRequirement', {

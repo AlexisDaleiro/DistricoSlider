@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "brand": {
+    "id": "granplus",
+    "name": "GranPlus",
+    "appName": "GranPlusSlider",
+    "androidAppId": "uy.kioskpuzzle.districo",
+    "logo": "assets/logo.svg",
+    "logoOnPrimary": "assets/logo-on-primary.svg"
+  },
+  "event": {
+    "id": "granplus",
+    "name": "Cada conexión cuenta.",
+    "locale": "es-UY"
+  },
+  "theme": {
+    "colors": {
+      "primary": "#54032A",
+      "onPrimary": "#FFFFFF",
+      "secondary": "#F3C879",
+      "onSecondary": "#54032A",
+      "background": "#FFF6E6",
+      "surface": "#FFFFFF",
+      "text": "#54032A",
+      "textMuted": "#7A4D5E",
+      "success": "#22704D",
+      "danger": "#B42318",
+      "tileGap": "#F3E2C4"
+    },
+    "fonts": {
+      "heading": {
+        "family": "Figtree",
+        "file": "assets/fonts/figtree-latin-800-normal.woff2",
+        "weight": 800
+      },
+      "body": {
+        "family": "Figtree",
+        "file": "assets/fonts/figtree-latin-400-normal.woff2",
+        "weight": 400
+      }
+    },
+    "radius": "18px",
+    "backgroundImage": null
+  },
+  "attract": {
+    "startButton": "Empezar juego",
+    "rankingButton": "Ver ranking",
+    "backButton": "Volver",
+    "animation": "puzzle-assemble",
+    "animationCycleMs": 9000,
+    "mode": "slideshow",
+    "media": ["assets/attract/cover.webp"],
+    "slideIntervalMs": 6000,
+    "headline": "Conectá todas las piezas.",
+    "cta": "Empezar el desafío"
+  },
+  "form": {
+    "title": "Registrate para participar",
+    "fields": [
+      {
+        "id": "name",
+        "type": "text",
+        "label": "Nombre y apellido",
+        "required": true,
+        "minLength": 2,
+        "maxLength": 80
+      },
+      {
+        "id": "phone",
+        "type": "tel",
+        "label": "Celular",
+        "required": true,
+        "defaultCountry": "UY"
+      }
+    ],
+    "consent": {
+      "required": true,
+      "version": "2026-10-22",
+      "text": "Acepto que se registren mi nombre, celular y resultados en la central de juegos para gestionar mi participación."
+    },
+    "marketingOptIn": {
+      "enabled": false,
+      "text": "Quiero recibir novedades y promociones."
+    },
+    "submit": "Registrarme y continuar"
+  },
+  "game": {
+    "gridSize": 3,
+    "images": [
+      {
+        "src": "assets/puzzle/granplus-carne.jpg",
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      {
+        "src": "assets/puzzle/granplus-salmon.jpg",
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      }
+    ],
+    "imageSelection": "random",
+    "shuffleMoves": {
+      "3": 60,
+      "4": 160
+    },
+    "showTileNumbers": false,
+    "showPreviewButton": true,
+    "countdownSec": 3,
+    "maxDurationSec": 300,
+    "tileAnimationMs": 130,
+    "invalidMoveAnimationMs": 120,
+    "victoryAnimationMs": 400,
+    "swipeThresholdPx": 24,
+    "sounds": {
+      "enabled": false,
+      "move": "assets/sounds/move.wav",
+      "win": "assets/sounds/win.wav"
+    }
+  },
+  "leaderboard": {
+    "size": 10,
+    "nameFormat": "firstNameLastInitial",
+    "showCompany": false,
+    "repeatPlayers": "bestScoreOnly"
+  },
+  "kiosk": {
+    "orientation": "landscape",
+    "inactivityMs": {
+      "form": 60000,
+      "countdown": 30000,
+      "game": 90000,
+      "result": 15000,
+      "leaderboard": 20000,
+      "admin": 60000
+    },
+    "warningMs": 10000,
+    "errorRecoveryMs": 2000,
+    "adminHotspot": "top-right",
+    "adminTapCount": 5,
+    "adminTapWindowMs": 3000,
+    "admin": {
+      "pinTimeoutMs": 20000,
+      "resetHoldMs": 2000,
+      "deleteHoldMs": 3000,
+      "lockoutBaseMs": 30000,
+      "lockoutMaxMs": 900000,
+      "maxAttempts": 3,
+      "exportFreshMs": 600000
+    },
+    "splashMs": 1200
+  },
+  "export": {
+    "filePrefix": "leads_granplus",
+    "csvSeparator": ";",
+    "includeXlsx": true
+  },
+  "texts": {
+    "showcase.eyebrow": "Una marca. Todas sus piezas.",
+    "showcase.description": "Un desafío para mirar distinto. Deslizá las piezas, encontrá su lugar y armá la imagen completa.",
+    "showcase.status": "Identidad lista · Motor verificado",
+    "showcase.imageAlt": "Composición de nueve zonas de colores con círculo, triángulo, cruz, rombo, cuadrado, arco, barras, anillo y estrella.",
+    "showcase.imageCaption": "Cada pieza tiene su lugar.",
+    "showcase.grid": "{size} × {size}",
+    "showcase.scope": "Vista de marca · Fases 1 y 2",
+    "game.eyebrow": "El desafío GranPlus"
+  }
+}

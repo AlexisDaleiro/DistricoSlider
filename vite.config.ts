@@ -1,14 +1,14 @@
-import { resolve } from 'node:path';
 import { pbkdf2Sync, randomBytes } from 'node:crypto';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { projectRoot, validateBrand } from './scripts/validate-brand.ts';
+import { validateBrand } from './scripts/validate-brand.ts';
 import packageJson from './package.json' with { type: 'json' };
 
 export default defineConfig(async () => {
-  const brand = process.env.VITE_BRAND ?? 'demo';
-  await validateBrand(brand);
+  // Varias marcas en un APK: "biofresh,granplus"; la primera es la inicial.
+  const brands = (process.env.VITE_BRAND ?? 'demo').split(',');
+  for (const brand of brands) await validateBrand(brand);
   const pin = process.env.ADMIN_PIN ?? '0000';
   if (!/^\d{4}$/.test(pin))
     throw new Error('ADMIN_PIN debe contener exactamente 4 dígitos.');
@@ -22,9 +22,9 @@ export default defineConfig(async () => {
         isDefault: pin === '0000',
       }),
       __APP_VERSION__: JSON.stringify(packageJson.version),
+      __BRANDS__: JSON.stringify(brands),
     },
     plugins: [react(), tailwindcss()],
-    resolve: { alias: { '@brand': resolve(projectRoot, 'brands', brand) } },
     build: { assetsInlineLimit: 0, target: 'es2020', manifest: true },
     optimizeDeps: { entries: ['index.html'] },
     server: {

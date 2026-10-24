@@ -99,6 +99,7 @@ textarea {
   cursor: default;
 }
 .attract-screen {
+  --attract-header-height: 3.75rem;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -129,15 +130,29 @@ textarea {
   );
 }
 .attract-layout {
-  @apply mx-auto grid max-w-6xl items-center gap-14 px-7 py-10 sm:px-10 lg:grid-cols-2 lg:gap-20;
-  min-height: calc(100dvh - 6.5rem);
+  @apply mx-auto grid max-w-6xl grid-cols-2 content-center items-center gap-4 px-4 py-4;
+  min-height: calc(
+    100dvh - var(--attract-header-height) - env(safe-area-inset-top) -
+      env(safe-area-inset-bottom)
+  );
+}
+.attract-copy {
+  grid-column: 1 / -1;
 }
 .attract-headline {
-  @apply mt-5 font-heading text-5xl leading-[1.02] font-bold tracking-tight sm:text-6xl lg:text-7xl;
+  @apply mt-3 font-heading text-[2rem] leading-[1.06] font-bold tracking-tight;
+}
+.attract-description {
+  @apply mt-4 max-w-[38.75rem] text-sm leading-relaxed;
+}
+.attract-actions {
+  @apply grid min-w-0 gap-3;
+  grid-column: 1;
 }
 .attract-button {
   min-height: 64px;
   font-size: 1.125rem;
+  padding-inline: 0.75rem;
 }
 .attract-start {
   animation: attract-invite var(--attract-cycle) ease-in-out infinite;
@@ -146,9 +161,67 @@ textarea {
   animation-play-state: paused;
 }
 .attract-figure {
-  width: min(100%, calc(100dvh - 16rem), 34rem);
-  justify-self: center;
-  padding: 1.25rem;
+  width: min(100%, 24rem);
+  min-width: 0;
+  grid-column: 2;
+  justify-self: end;
+}
+.attract-screen .game-header {
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
+}
+.attract-screen .game-header img {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+}
+.attract-screen .game-header > div {
+  min-width: 0;
+  gap: 0.75rem;
+}
+.attract-screen .game-header .font-heading {
+  font-size: 1rem;
+}
+.attract-screen .game-header > span {
+  max-width: 9.375rem;
+  font-size: 0.75rem;
+}
+@media (min-width: 48rem) {
+  .attract-screen {
+    --attract-header-height: 5rem;
+  }
+  .attract-layout {
+    gap: 1.25rem 1.5rem;
+    padding: 1.5rem 2rem;
+  }
+  .attract-headline {
+    font-size: 3rem;
+  }
+  .attract-description {
+    font-size: 1rem;
+  }
+  .attract-screen .game-header {
+    padding-inline: 2rem;
+  }
+  .attract-screen .game-header img {
+    width: 4rem;
+    height: 4rem;
+  }
+  .attract-screen .game-header .font-heading {
+    font-size: 1.25rem;
+  }
+  .attract-screen .game-header > span {
+    max-width: 12rem;
+    font-size: 0.875rem;
+  }
+}
+@media (min-width: 64rem) and (orientation: landscape) {
+  .attract-headline {
+    font-size: 4rem;
+  }
+  .attract-figure {
+    width: min(100%, 26.25rem);
+  }
 }
 .attract-puzzle {
   position: relative;

@@ -13,8 +13,7 @@
     "verbatimModuleSyntax": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["vite/client", "node"],
-    "paths": { "@brand/*": ["./brands/demo/*"] }
+    "types": ["vite/client", "node"]
   },
   "include": ["src", "scripts", "vite.config.ts", "capacitor.config.ts"]
 }

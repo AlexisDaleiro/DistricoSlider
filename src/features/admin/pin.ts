@@ -80,5 +80,8 @@ export function createPinService(
   };
 }
 export function pinService(brand: BrandConfig) {
-  return createPinService(createPinRepo(brand.brand.id), brand.kiosk.admin);
+  return createPinService(
+    createPinRepo(brand.brand.androidAppId),
+    brand.kiosk.admin,
+  );
 }

@@ -6,7 +6,8 @@ import { normalize } from '../normalize';
 import { dayKey } from '../../../shared/lib/time';
 import { formatPlayerName } from '../../leaderboard/formatPlayerName';
 import { selectGameImage } from '../../game/image/selectGameImage';
-import districoRaw from '../../../../brands/districo/theme.config.json';
+import biofreshRaw from '../../../../brands/biofresh/theme.config.json';
+import granplusRaw from '../../../../brands/granplus/theme.config.json';
 import { mulberry32 } from '../../game/engine/rng';
 
 const brand = brandSchema.parse(raw);
@@ -100,19 +101,25 @@ it('dayKey usa el día local, incluyendo el borde de medianoche', () => {
     '2026-10-20',
   );
 });
-it('Districo usa las tres fotos únicas y el sorteo siempre elige del pool sin selector', () => {
-  const images = brandSchema.parse(districoRaw).game.images;
-  expect(images.map((image) => image.src)).toEqual([
+it('cada marca sortea solo sus bolsas y separa evento y export', () => {
+  const bio = brandSchema.parse(biofreshRaw);
+  const gran = brandSchema.parse(granplusRaw);
+  expect(bio.game.images.map((image) => image.src)).toEqual([
     'assets/puzzle/biofresh.jpg',
+  ]);
+  const images = gran.game.images;
+  expect(images.map((image) => image.src)).toEqual([
     'assets/puzzle/granplus-carne.jpg',
     'assets/puzzle/granplus-salmon.jpg',
   ]);
   expect(selectGameImage(images, () => 0)).toBe(images[0]);
-  expect(selectGameImage(images, () => 0.5)).toBe(images[1]);
-  expect(selectGameImage(images, () => 0.9999)).toBe(images[2]);
+  expect(selectGameImage(images, () => 0.9999)).toBe(images[1]);
   const rng = mulberry32(42);
   const chosen = new Set(
     Array.from({ length: 100 }, () => selectGameImage(images, rng).src),
   );
-  expect(chosen.size).toBe(3);
+  expect(chosen.size).toBe(2);
+  expect(bio.event.id).not.toBe(gran.event.id);
+  expect(bio.export.filePrefix).not.toBe(gran.export.filePrefix);
+  expect(bio.brand.androidAppId).toBe(gran.brand.androidAppId);
 });
