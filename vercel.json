@@ -1,0 +1,3 @@
+{
+  "buildCommand": "VITE_BRAND=biofresh,granplus npm run build"
+}
